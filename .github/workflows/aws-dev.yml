@@ -53,4 +53,4 @@ jobs:
           
       - name: Publish
         run: |
-          aws ecs update-service --service sdk-snowman-dev-topia0-svc --force-new-deployment --cluster SDK-Example-CLS
+          aws ecs update-service --service topia-dev-connect40 --force-new-deployment --cluster topia-dev-sdk-apps
