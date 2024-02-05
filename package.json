@@ -1,0 +1,29 @@
+{
+  "name": "connect-4",
+  "private": true,
+  "author": "Topia",
+  "version": "1.0",
+  "description": "",
+  "main": "index.js",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "start:dev": "concurrently \"npm run serve --workspace=server\" \"npm run dev --workspace=client\"",
+    "build:prod": "npm run build -w server && npm run build -w client"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Automatopia-MC/rnd-boilerplate.git"
+  },
+  "keywords": [],
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Automatopia-MC/rnd-boilerplate/issues"
+  },
+  "homepage": "https://github.com/Automatopia-MC/rnd-boilerplate#readme",
+  "devDependencies": {
+    "concurrently": "^8.2.1"
+  }
+}

@@ -4,4 +4,4 @@ ADD build ./build
 ADD package* ./
 ADD node_modules ./node_modules
 EXPOSE 3000
-ENTRYPOINT [ "node", "server/build/index.js" ]
+ENTRYPOINT [ "node", "build/index.js" ]
