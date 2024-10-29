@@ -1,8 +1,8 @@
 import {
+  DroppedAsset,
   dropTextAsset,
   dropWebImageAsset,
   errorHandler,
-  getDroppedAsset,
   initializeDroppedAssetDataObject,
 } from "./index.js";
 import { Credentials } from "../types/credentialsInterface.js";
@@ -10,22 +10,22 @@ import { defaultGameText } from "../constants.js";
 
 export const generateBoard = async (credentials: Credentials) => {
   try {
-    const { assetId } = credentials;
-    const keyAsset = await getDroppedAsset(credentials);
+    const { assetId, sceneDropId, urlSlug } = credentials;
+    const keyAsset = await DroppedAsset.get(assetId, urlSlug, { credentials });
     const { position: resetBtnCenter } = keyAsset;
     const boardCenter = {
       x: resetBtnCenter.x,
       y: resetBtnCenter.y - 300,
     };
 
-    initializeDroppedAssetDataObject(keyAsset);
+    initializeDroppedAssetDataObject(keyAsset, sceneDropId);
 
     await Promise.all([
       dropWebImageAsset({
         credentials,
         layer1: `${process.env.BUCKET}board.png`,
         position: boardCenter,
-        uniqueName: `${assetId}_connect4_board`,
+        uniqueName: `board`,
       }),
       dropTextAsset({
         credentials,
@@ -35,7 +35,7 @@ export const generateBoard = async (credentials: Credentials) => {
         },
         style: { textSize: 22 },
         text: defaultGameText,
-        uniqueName: `${assetId}_connect4_gameText`,
+        uniqueName: `gameText`,
       }),
       dropTextAsset({
         credentials,
@@ -45,7 +45,7 @@ export const generateBoard = async (credentials: Credentials) => {
         },
         style: { textSize: 20, textWidth: 150 },
         text: "",
-        uniqueName: `${assetId}_connect4_player1Text`,
+        uniqueName: `player1Text`,
       }),
       dropTextAsset({
         credentials,
@@ -55,7 +55,7 @@ export const generateBoard = async (credentials: Credentials) => {
         },
         style: { textSize: 20, textWidth: 150 },
         text: "",
-        uniqueName: `${assetId}_connect4_player2Text`,
+        uniqueName: `player2Text`,
       }),
     ]);
 
@@ -67,7 +67,7 @@ export const generateBoard = async (credentials: Credentials) => {
           x: resetBtnCenter.x - 400,
           y: boardCenter.y - 200,
         },
-        uniqueName: `${assetId}_connect4_o`,
+        uniqueName: `player1`,
       }),
       dropWebImageAsset({
         credentials,
@@ -76,7 +76,7 @@ export const generateBoard = async (credentials: Credentials) => {
           x: resetBtnCenter.x + 400,
           y: boardCenter.y - 200,
         },
-        uniqueName: `${assetId}_connect4_x`,
+        uniqueName: `player2`,
       }),
       dropWebImageAsset({
         credentials,
@@ -85,7 +85,7 @@ export const generateBoard = async (credentials: Credentials) => {
           x: boardCenter.x - 255,
           y: boardCenter.y - 305,
         },
-        uniqueName: `${assetId}_connect4_selector`,
+        uniqueName: `selector`,
       }),
       dropWebImageAsset({
         credentials,
@@ -94,7 +94,7 @@ export const generateBoard = async (credentials: Credentials) => {
           x: boardCenter.x - 170,
           y: boardCenter.y - 305,
         },
-        uniqueName: `${assetId}_connect4_selector`,
+        uniqueName: `selector`,
       }),
       dropWebImageAsset({
         credentials,
@@ -103,7 +103,7 @@ export const generateBoard = async (credentials: Credentials) => {
           x: boardCenter.x - 85,
           y: boardCenter.y - 305,
         },
-        uniqueName: `${assetId}_connect4_selector`,
+        uniqueName: `selector`,
       }),
       dropWebImageAsset({
         credentials,
@@ -112,7 +112,7 @@ export const generateBoard = async (credentials: Credentials) => {
           x: boardCenter.x,
           y: boardCenter.y - 305,
         },
-        uniqueName: `${assetId}_connect4_selector`,
+        uniqueName: `selector`,
       }),
       dropWebImageAsset({
         credentials,
@@ -121,7 +121,7 @@ export const generateBoard = async (credentials: Credentials) => {
           x: boardCenter.x + 85,
           y: boardCenter.y - 305,
         },
-        uniqueName: `${assetId}_connect4_selector`,
+        uniqueName: `selector`,
       }),
       dropWebImageAsset({
         credentials,
@@ -130,7 +130,7 @@ export const generateBoard = async (credentials: Credentials) => {
           x: boardCenter.x + 170,
           y: boardCenter.y - 305,
         },
-        uniqueName: `${assetId}_connect4_selector`,
+        uniqueName: `selector`,
       }),
       dropWebImageAsset({
         credentials,
@@ -139,7 +139,7 @@ export const generateBoard = async (credentials: Credentials) => {
           x: boardCenter.x + 255,
           y: boardCenter.y - 305,
         },
-        uniqueName: `${assetId}_connect4_selector`,
+        uniqueName: `selector`,
       }),
     ]);
 

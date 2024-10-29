@@ -6,19 +6,19 @@ import {
   getDroppedAssetDataObject,
   getGameStatus,
   lockDataObject,
-  updateGameText,
   addNewRowToGoogleSheets,
   Visitor,
-  DroppedAsset,
   getPosition,
+  World,
 } from "../utils/index.js";
 import { GameDataType } from "../types/gameDataType.js";
 
 export const handleDropPiece = async (req: Request, res: Response) => {
   try {
     const credentials = getCredentials(req.body);
-    const { displayName, identityId, urlSlug, visitorId } = credentials;
+    const { displayName, identityId, sceneDropId, urlSlug, visitorId } = credentials;
     const { username } = req.body;
+
     let text = "",
       shouldUpdateGame = false,
       analytics = [];
@@ -93,21 +93,26 @@ export const handleDropPiece = async (req: Request, res: Response) => {
         shouldUpdateGame = true;
       }
 
+      const world = World.create(urlSlug, { credentials });
+      const gameText = await world.fetchDroppedAssetsBySceneDropId({
+        sceneDropId,
+        uniqueName: "gameText",
+      });
+
       if (!shouldUpdateGame) {
-        await updateGameText(credentials, text, `${keyAssetId}_connect4_gameText`);
+        gameText[0]?.updateCustomTextAsset({}, text);
         throw text;
       }
 
       const promises = [];
 
-      const droppedAsset = await DroppedAsset.get(keyAssetId, urlSlug);
-      const position = getPosition(claimedSpace, droppedAsset.position);
+      const position = getPosition(claimedSpace, keyAsset.position);
       promises.push(
         dropWebImageAsset({
           credentials,
           layer0: `${process.env.BUCKET}${visitorId === player1.visitorId ? "player1" : "player2"}.png`,
           position: { x: Math.round(position.x), y: Math.round(position.y) },
-          uniqueName: `${keyAssetId}_connect4_claimedSpace`,
+          uniqueName: "claimedSpace",
         }),
       );
 
@@ -123,14 +128,14 @@ export const handleDropPiece = async (req: Request, res: Response) => {
         const keyAssetPosition = keyAsset.position;
         const position = {
           x: player1.visitorId === visitorId ? keyAssetPosition.x - 400 : keyAssetPosition.x + 400,
-          y: keyAssetPosition.y - 620,
+          y: keyAssetPosition.y - 590,
         };
         promises.push(
           dropWebImageAsset({
             credentials,
             layer0: `${process.env.BUCKET}crown.png`,
             position,
-            uniqueName: `${keyAssetId}_connect4_crown`,
+            uniqueName: "crown",
           }),
         );
 
@@ -147,9 +152,10 @@ export const handleDropPiece = async (req: Request, res: Response) => {
         ]);
       }
 
-      promises.push(keyAsset.updateDataObject(updatedData, { analytics }));
-
-      promises.push(updateGameText(credentials, text, `${keyAssetId}_connect4_gameText`));
+      promises.push(
+        keyAsset.updateDataObject(updatedData, { analytics }),
+        gameText[0]?.updateCustomTextAsset({}, text),
+      );
 
       await Promise.all(promises);
     } catch (error) {

@@ -7,4 +7,3 @@ export * from "./getGameStatus.js";
 export * from "./getPosition.js";
 export * from "./lockDataObject.js";
 export * from "./topiaInit.js";
-export * from "./updateGameText.js";

@@ -1,19 +1,14 @@
 import { Request, Response } from "express";
-import {
-  errorHandler,
-  getDroppedAssetDataObject,
-  getCredentials,
-  lockDataObject,
-  updateGameText,
-} from "../utils/index.js";
+import { errorHandler, getDroppedAssetDataObject, getCredentials, lockDataObject, World } from "../utils/index.js";
 import { GameDataType } from "../types/gameDataType.js";
+import { DroppedAssetInterface } from "@rtsdk/topia";
 
 export const handlePlayerSelection = async (req: Request, res: Response) => {
   try {
     const playerId = req.params.player;
     const isPlayer2 = parseInt(playerId) === 2;
     const credentials = getCredentials(req.body);
-    const { profileId, urlSlug, visitorId } = credentials;
+    const { profileId, sceneDropId, urlSlug, visitorId } = credentials;
     const { username } = req.body;
 
     let text = "",
@@ -48,8 +43,15 @@ export const handlePlayerSelection = async (req: Request, res: Response) => {
         text = "Find a second player!";
       }
 
+      const world = World.create(urlSlug, { credentials });
+      const droppedAssets: DroppedAssetInterface[] = await world.fetchDroppedAssetsBySceneDropId({
+        sceneDropId,
+      });
+      const gameText = droppedAssets.find((droppedAsset) => droppedAsset.uniqueName === "gameText");
+      const playerText = droppedAssets.find((droppedAsset) => droppedAsset.uniqueName === `player${playerId}Text`);
+
       if (!shouldUpdateGame) {
-        await updateGameText(credentials, text, `${keyAssetId}_connect4_gameText`);
+        gameText?.updateCustomTextAsset({}, text);
         throw text;
       }
 
@@ -64,8 +66,8 @@ export const handlePlayerSelection = async (req: Request, res: Response) => {
             analytics: [{ analyticName: "joins", profileId, urlSlug, uniqueKey: profileId }],
           },
         ),
-        updateGameText(credentials, text, `${keyAssetId}_connect4_gameText`),
-        updateGameText(credentials, username, `${keyAssetId}_connect4_player${playerId}Text`),
+        gameText?.updateCustomTextAsset({}, text),
+        playerText?.updateCustomTextAsset({}, username),
       ]);
     } catch (error) {
       await keyAsset.updateDataObject({ playerCount: playerCount + 1 });

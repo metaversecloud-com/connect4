@@ -1,16 +1,41 @@
-import { errorHandler, DroppedAsset, getDroppedAsset, initializeDroppedAssetDataObject } from "../index.js";
-import { Credentials } from "../../types/credentialsInterface.js";
+import { errorHandler, DroppedAsset, initializeDroppedAssetDataObject, World } from "../index.js";
+import { Credentials, WorldDataObjectType } from "../../types/index.js";
 
 export const getDroppedAssetDataObject = async (credentials: Credentials) => {
   try {
-    const droppedAsset = await getDroppedAsset(credentials);
-    const uniqueName = droppedAsset.uniqueName.split("_connect4_");
-    const keyAssetId = !uniqueName[0] || uniqueName[0].toLowerCase() === "reset" ? credentials.assetId : uniqueName[0];
+    let { assetId, sceneDropId, urlSlug } = credentials;
+    let keyAssetId = assetId;
 
-    const keyAsset = await DroppedAsset.get(keyAssetId, credentials.urlSlug, {
+    const world = World.create(urlSlug, { credentials });
+    await world.fetchDataObject();
+    const dataObject = world.dataObject as WorldDataObjectType;
+
+    if (!sceneDropId) {
+      keyAssetId = assetId;
+      sceneDropId = assetId;
+    } else if (dataObject?.[sceneDropId]?.keyAssetId) {
+      keyAssetId = dataObject[sceneDropId].keyAssetId;
+    } else {
+      const droppedAssets = await world.fetchDroppedAssetsBySceneDropId({
+        sceneDropId,
+        uniqueName: "reset",
+      });
+
+      keyAssetId = droppedAssets[0]?.id;
+    }
+
+    if (!keyAssetId) throw "No key asset found.";
+
+    if (!dataObject || Object.keys(dataObject).length === 0) {
+      await world.setDataObject({ [sceneDropId]: { keyAssetId } });
+    } else if (!dataObject[sceneDropId]) {
+      await world.updateDataObject({ [sceneDropId]: { keyAssetId } });
+    }
+
+    const keyAsset = await DroppedAsset.get(keyAssetId, urlSlug, {
       credentials: { ...credentials, assetId: keyAssetId },
     });
-    const wasDataObjectInitialized = await initializeDroppedAssetDataObject(keyAsset);
+    const wasDataObjectInitialized = await initializeDroppedAssetDataObject(keyAsset, sceneDropId);
 
     return { keyAsset, wasDataObjectInitialized };
   } catch (error) {

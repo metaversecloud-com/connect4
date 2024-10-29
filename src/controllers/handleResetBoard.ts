@@ -3,19 +3,18 @@ import {
   errorHandler,
   getDroppedAssetDataObject,
   generateBoard,
-  updateGameText,
   Visitor,
   World,
   DroppedAsset,
 } from "../utils/index.js";
 import { GameDataType } from "../types/index.js";
 import { defaultGameData, defaultGameText } from "../constants.js";
-import { VisitorInterface } from "@rtsdk/topia";
+import { DroppedAssetInterface, VisitorInterface } from "@rtsdk/topia";
 
 export const handleResetBoard = async (req: Request, res: Response) => {
   try {
     const credentials = req.credentials;
-    const { assetId, urlSlug, visitorId } = credentials;
+    const { assetId, sceneDropId, urlSlug, visitorId } = credentials;
 
     const visitor: VisitorInterface = await Visitor.get(visitorId, urlSlug, { credentials });
     const isAdmin = visitor.isAdmin;
@@ -28,7 +27,18 @@ export const handleResetBoard = async (req: Request, res: Response) => {
       return res.status(200).send({ message: "Game created successfully" });
     }
 
-    await updateGameText(credentials, "Reset in progress...", `${assetId}_connect4_gameText`);
+    let droppedAssetIds = [],
+      droppedAssets: DroppedAssetInterface[];
+    const world = World.create(urlSlug, { credentials });
+
+    // get all assets with matching sceneDropId for full board rebuild
+    droppedAssets = await world.fetchDroppedAssetsBySceneDropId({
+      sceneDropId,
+    });
+    droppedAssets = droppedAssets.filter((item) => item.uniqueName !== "reset");
+
+    const gameText = droppedAssets.find((droppedAsset) => droppedAsset.uniqueName === "gameText");
+    if (gameText) await gameText.updateCustomTextAsset({}, "Reset in progress...");
 
     try {
       try {
@@ -57,37 +67,20 @@ export const handleResetBoard = async (req: Request, res: Response) => {
         throw "You must be either a player or admin to reset the board";
       }
 
-      let droppedAssetIds = [],
-        droppedAssets;
-      const world = World.create(urlSlug, { credentials });
+      if (!isAdmin) {
+        const p1text = droppedAssets.find((droppedAsset) => droppedAsset.uniqueName === "player1Text");
+        if (p1text) await p1text.updateCustomTextAsset({}, "");
+        const p2text = droppedAssets.find((droppedAsset) => droppedAsset.uniqueName === "player2Text");
+        if (p2text) await p2text.updateCustomTextAsset({}, "");
 
-      if (isAdmin) {
-        // get all assets with assetId in unique name for full board rebuild
-        droppedAssets = await world.fetchDroppedAssetsWithUniqueName({
-          isPartial: true,
-          uniqueName: assetId,
-        });
-      } else {
-        // get only game move assets with assetId in unique name
-        droppedAssets = await world.fetchDroppedAssetsWithUniqueName({
-          isPartial: false,
-          uniqueName: `${assetId}_connect4_claimedSpace`,
-        });
+        if (gameText) await gameText.updateCustomTextAsset({}, defaultGameText);
 
-        const crown = await world.fetchDroppedAssetsWithUniqueName({
-          isPartial: false,
-          uniqueName: `${assetId}_connect4_crown`,
-        });
-        if (crown.length > 0) droppedAssetIds.push(crown[0].id);
-
-        updateGameText(credentials, "", `${assetId}_connect4_player1Text`);
-        updateGameText(credentials, "", `${assetId}_connect4_player2Text`);
-        updateGameText(credentials, defaultGameText, `${assetId}_connect4_gameText`);
+        droppedAssets = droppedAssets.filter(
+          (item) => item.uniqueName === "claimedSpace" || item.uniqueName === "crown",
+        );
       }
 
-      for (const droppedAsset in droppedAssets) {
-        droppedAssetIds.push(droppedAssets[droppedAsset].id);
-      }
+      for (const droppedAsset in droppedAssets) droppedAssetIds.push(droppedAssets[droppedAsset].id);
       if (droppedAssetIds.length > 0) {
         promises.push(World.deleteDroppedAssets(urlSlug, droppedAssetIds, process.env.INTERACTIVE_SECRET, credentials));
       }
@@ -102,6 +95,7 @@ export const handleResetBoard = async (req: Request, res: Response) => {
           keyAssetId: assetId,
           isResetInProgress: false,
           resetCount: resetCount + 1,
+          sceneDropId,
         }),
       );
 
@@ -117,10 +111,8 @@ export const handleResetBoard = async (req: Request, res: Response) => {
 
       return res.status(200).send({ message: "Game reset successfully" });
     } catch (error) {
-      await Promise.all([
-        updateGameText(credentials, "", `${assetId}_connect4_gameText`),
-        keyAsset.updateDataObject({ isResetInProgress: false, resetCount: resetCount + 1 }),
-      ]);
+      if (gameText) gameText.updateCustomTextAsset({}, "");
+      await keyAsset.updateDataObject({ isResetInProgress: false, resetCount: resetCount + 1 });
       throw error;
     }
   } catch (error) {

@@ -1,7 +1,7 @@
 import { defaultGameData } from "../../constants.js";
 import { errorHandler } from "../index.js";
 
-export const initializeDroppedAssetDataObject = async (droppedAsset) => {
+export const initializeDroppedAssetDataObject = async (droppedAsset, sceneDropId) => {
   try {
     let wasDataObjectInitialized = false;
     await droppedAsset.fetchDataObject();
@@ -13,6 +13,7 @@ export const initializeDroppedAssetDataObject = async (droppedAsset) => {
         {
           ...defaultGameData,
           keyAssetId: droppedAsset.id,
+          sceneDropId,
         },
         { lock: { lockId, releaseLock: true } },
       );
