@@ -1,29 +1,50 @@
 {
-  "name": "connect-4",
+  "name": "Connect 4",
   "private": true,
   "author": "Topia",
-  "version": "1.0",
-  "description": "",
-  "main": "index.js",
-  "workspaces": [
-    "client",
-    "server"
-  ],
-  "scripts": {
-    "start:dev": "concurrently \"npm run serve --workspace=server\" \"npm run dev --workspace=client\"",
-    "build": "npm run build -w server && npm run build -w client"
+  "version": "1.0.1",
+  "description": "An on canvas Connect 4 game.",
+  "main": "src/index.ts",
+  "dependencies": {
+    "@googleapis/sheets": "^7.0.0",
+    "@rtsdk/topia": "^0.12.5",
+    "@types/cors": "^2.8.13",
+    "axios": "^1.5.0",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-queue": "^0.0.13",
+    "express-timeout-handler": "^2.2.2",
+    "google-auth-library": "^9.10.0",
+    "jsonwebtoken": "^9.0.1",
+    "node": "^20.5.1",
+    "node-cron": "^3.0.2",
+    "nodemon": "^3.0.1",
+    "yalc": "^1.0.0-pre.53"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Automatopia-MC/rnd-boilerplate.git"
+  "devDependencies": {
+    "@tsconfig/node-lts": "^20.1.0",
+    "@types/cors": "^2.8.13",
+    "@types/express": "^4.17.17",
+    "@types/jsonwebtoken": "^9.0.2",
+    "@types/node": "^20.10.6",
+    "@types/node-cron": "^3.0.8",
+    "eslint-config-next": "13.4.19",
+    "nodemon": "^3.0.1",
+    "sequelize-typescript": "^2.1.5",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.3.3"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "serve": "npx tsc -w & npx nodemon -q build/src/index.js",
+    "dev": "npx tsx watch src/index.ts",
+    "start": "node build/src/index.js",
+    "link-sdk": "yalc link @rtsdk/topia",
+    "unlink-sdk": "yalc remove @rtsdk/topia"
   },
   "keywords": [],
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Automatopia-MC/rnd-boilerplate/issues"
-  },
-  "homepage": "https://github.com/Automatopia-MC/rnd-boilerplate#readme",
-  "devDependencies": {
-    "concurrently": "^8.2.1"
-  }
+  "type": "module"
 }
