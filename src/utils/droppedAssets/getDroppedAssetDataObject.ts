@@ -1,5 +1,6 @@
 import { errorHandler, DroppedAsset, initializeDroppedAssetDataObject, World } from "../index.js";
 import { Credentials, WorldDataObjectType } from "../../types/index.js";
+import { DroppedAssetInterface } from "@rtsdk/topia";
 
 export const getDroppedAssetDataObject = async (credentials: Credentials) => {
   try {
@@ -16,16 +17,17 @@ export const getDroppedAssetDataObject = async (credentials: Credentials) => {
     } else if (dataObject?.[sceneDropId]?.keyAssetId) {
       keyAssetId = dataObject[sceneDropId].keyAssetId;
     } else {
-      const droppedAssets = await world.fetchDroppedAssetsBySceneDropId({
+      const droppedAssets: DroppedAssetInterface[] = await world.fetchDroppedAssetsBySceneDropId({
         sceneDropId,
-        uniqueName: "reset",
       });
-
-      keyAssetId = droppedAssets[0]?.id;
+      const keyAsset = droppedAssets.find((droppedAsset) => droppedAsset.uniqueName === "reset");
+      keyAssetId = keyAsset?.id;
     }
 
     if (!keyAssetId) throw "No key asset found.";
 
+    // store keyAssetId by sceneDropId in World data object so that it can be accessed by any clickable asset
+    // this supports a scene being dropped with the board already created instead of just the Reset button
     if (!dataObject || Object.keys(dataObject).length === 0) {
       await world.setDataObject({ [sceneDropId]: { keyAssetId } });
     } else if (!dataObject[sceneDropId]) {

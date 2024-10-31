@@ -12,6 +12,7 @@ import {
   World,
 } from "../utils/index.js";
 import { GameDataType } from "../types/gameDataType.js";
+import { DroppedAssetInterface } from "@rtsdk/topia";
 
 export const handleDropPiece = async (req: Request, res: Response) => {
   try {
@@ -24,7 +25,7 @@ export const handleDropPiece = async (req: Request, res: Response) => {
       analytics = [];
 
     const column = parseInt(req.params.column);
-    if (isNaN(column)) throw "Cell is missing.";
+    if (isNaN(column)) throw "Column id is required.";
 
     const { keyAsset } = await getDroppedAssetDataObject(credentials);
 
@@ -39,6 +40,8 @@ export const handleDropPiece = async (req: Request, res: Response) => {
       resetCount,
       turnCount,
     } = keyAsset.dataObject as GameDataType;
+
+    if (isResetInProgress) throw "Reset in progress.";
 
     const columnStart =
       column === 0
@@ -56,12 +59,8 @@ export const handleDropPiece = async (req: Request, res: Response) => {
         : 36;
     const claimedSpace = columnStart + columns[column].length;
 
-    if (isResetInProgress) throw "Reset in progress.";
-
     const updatedData = {
       ...keyAsset.dataObject,
-      isGameOver,
-      lastPlayerTurn,
       lastInteraction: new Date(),
       turnCount: turnCount + 1,
     };
@@ -94,13 +93,15 @@ export const handleDropPiece = async (req: Request, res: Response) => {
       }
 
       const world = World.create(urlSlug, { credentials });
-      const gameText = await world.fetchDroppedAssetsBySceneDropId({
+      const droppedAssets: DroppedAssetInterface[] = await world.fetchDroppedAssetsBySceneDropId({
         sceneDropId,
-        uniqueName: "gameText",
       });
+      const gameText = droppedAssets.find((droppedAsset) => droppedAsset.uniqueName === "gameText");
+
+      if (!gameText) throw "Text assets are missing. Please have an admin reset the board.";
 
       if (!shouldUpdateGame) {
-        gameText[0]?.updateCustomTextAsset({}, text);
+        gameText.updateCustomTextAsset({}, text);
         throw text;
       }
 
@@ -110,7 +111,7 @@ export const handleDropPiece = async (req: Request, res: Response) => {
       promises.push(
         dropWebImageAsset({
           credentials,
-          layer0: `${process.env.BUCKET}${visitorId === player1.visitorId ? "player1" : "player2"}.png`,
+          layer0: `${process.env.S3_BUCKET}${visitorId === player1.visitorId ? "player1" : "player2"}.png`,
           position: { x: Math.round(position.x), y: Math.round(position.y) },
           uniqueName: "claimedSpace",
         }),
@@ -128,12 +129,12 @@ export const handleDropPiece = async (req: Request, res: Response) => {
         const keyAssetPosition = keyAsset.position;
         const position = {
           x: player1.visitorId === visitorId ? keyAssetPosition.x - 400 : keyAssetPosition.x + 400,
-          y: keyAssetPosition.y - 590,
+          y: keyAssetPosition.y - 580,
         };
         promises.push(
           dropWebImageAsset({
             credentials,
-            layer0: `${process.env.BUCKET}crown.png`,
+            layer0: `${process.env.S3_BUCKET}crown.png`,
             position,
             uniqueName: "crown",
           }),
@@ -152,10 +153,7 @@ export const handleDropPiece = async (req: Request, res: Response) => {
         ]);
       }
 
-      promises.push(
-        keyAsset.updateDataObject(updatedData, { analytics }),
-        gameText[0]?.updateCustomTextAsset({}, text),
-      );
+      promises.push(keyAsset.updateDataObject(updatedData, { analytics }), gameText.updateCustomTextAsset({}, text));
 
       await Promise.all(promises);
     } catch (error) {

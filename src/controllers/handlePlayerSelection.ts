@@ -50,8 +50,10 @@ export const handlePlayerSelection = async (req: Request, res: Response) => {
       const gameText = droppedAssets.find((droppedAsset) => droppedAsset.uniqueName === "gameText");
       const playerText = droppedAssets.find((droppedAsset) => droppedAsset.uniqueName === `player${playerId}Text`);
 
+      if (!gameText || !playerText) throw "Text assets are missing. Please have an admin reset the board.";
+
       if (!shouldUpdateGame) {
-        gameText?.updateCustomTextAsset({}, text);
+        gameText.updateCustomTextAsset({}, text);
         throw text;
       }
 
@@ -66,8 +68,8 @@ export const handlePlayerSelection = async (req: Request, res: Response) => {
             analytics: [{ analyticName: "joins", profileId, urlSlug, uniqueKey: profileId }],
           },
         ),
-        gameText?.updateCustomTextAsset({}, text),
-        playerText?.updateCustomTextAsset({}, username),
+        gameText.updateCustomTextAsset({}, text),
+        playerText.updateCustomTextAsset({}, username),
       ]);
     } catch (error) {
       await keyAsset.updateDataObject({ playerCount: playerCount + 1 });
