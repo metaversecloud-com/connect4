@@ -39,9 +39,7 @@ export const handleResetBoard = async (req: Request, res: Response) => {
 
     const gameText = droppedAssets.find((droppedAsset) => droppedAsset.uniqueName === "gameText");
 
-    if (!gameText) throw "Text assets are missing. Please have an admin reset the board.";
-
-    await gameText.updateCustomTextAsset({}, "Reset in progress...");
+    if (gameText) await gameText.updateCustomTextAsset({}, "Reset in progress...");
 
     try {
       try {
@@ -74,13 +72,9 @@ export const handleResetBoard = async (req: Request, res: Response) => {
         const p1text = droppedAssets.find((droppedAsset) => droppedAsset.uniqueName === "player1Text");
         const p2text = droppedAssets.find((droppedAsset) => droppedAsset.uniqueName === "player2Text");
 
-        if (!p1text || !p2text) throw "Text assets are missing. Please have an admin reset the board.";
-
-        promises.push(
-          p1text.updateCustomTextAsset({}, ""),
-          p2text.updateCustomTextAsset({}, ""),
-          gameText.updateCustomTextAsset({}, defaultGameText),
-        );
+        if (p1text) promises.push(p1text.updateCustomTextAsset({}, ""));
+        if (p2text) promises.push(p2text.updateCustomTextAsset({}, ""));
+        if (gameText) promises.push(gameText.updateCustomTextAsset({}, defaultGameText));
 
         droppedAssets = droppedAssets.filter(
           (item) => item.uniqueName === "claimedSpace" || item.uniqueName === "crown",

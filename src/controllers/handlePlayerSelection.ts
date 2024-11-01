@@ -50,14 +50,13 @@ export const handlePlayerSelection = async (req: Request, res: Response) => {
       const gameText = droppedAssets.find((droppedAsset) => droppedAsset.uniqueName === "gameText");
       const playerText = droppedAssets.find((droppedAsset) => droppedAsset.uniqueName === `player${playerId}Text`);
 
-      if (!gameText || !playerText) throw "Text assets are missing. Please have an admin reset the board.";
-
       if (!shouldUpdateGame) {
-        gameText.updateCustomTextAsset({}, text);
+        if (gameText) gameText.updateCustomTextAsset({}, text);
         throw text;
       }
 
-      await Promise.all([
+      const promises = [];
+      promises.push(
         keyAsset.updateDataObject(
           {
             lastInteraction: new Date(),
@@ -68,9 +67,10 @@ export const handlePlayerSelection = async (req: Request, res: Response) => {
             analytics: [{ analyticName: "joins", profileId, urlSlug, uniqueKey: profileId }],
           },
         ),
-        gameText.updateCustomTextAsset({}, text),
-        playerText.updateCustomTextAsset({}, username),
-      ]);
+      );
+      if (playerText) promises.push(playerText.updateCustomTextAsset({}, username));
+      if (gameText) promises.push(gameText.updateCustomTextAsset({}, text));
+      await Promise.all(promises);
     } catch (error) {
       await keyAsset.updateDataObject({ playerCount: playerCount + 1 });
       throw error;
