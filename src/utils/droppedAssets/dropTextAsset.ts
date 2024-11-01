@@ -25,13 +25,15 @@ export const dropTextAsset = async ({
   });
 
   const droppedAsset = await DroppedAsset.drop(asset, {
-    isInteractive: true,
     interactivePublicKey,
+    isInteractive: true,
+    isTextTopLayer: true,
     position,
     sceneDropId,
     text,
     uniqueName,
     urlSlug,
+    yOrderAdjust: 500,
     ...style,
   });
 

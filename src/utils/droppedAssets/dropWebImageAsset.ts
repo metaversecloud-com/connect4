@@ -21,8 +21,8 @@ export const dropWebImageAsset = async ({
   });
 
   const droppedAsset = await DroppedAsset.drop(asset, {
-    isInteractive: true,
     interactivePublicKey,
+    isInteractive: true,
     layer0,
     layer1,
     // @ts-ignore
@@ -30,6 +30,7 @@ export const dropWebImageAsset = async ({
     sceneDropId,
     uniqueName,
     urlSlug,
+    yOrderAdjust: 75,
   });
 
   return droppedAsset;

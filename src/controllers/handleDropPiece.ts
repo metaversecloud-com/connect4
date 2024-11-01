@@ -98,62 +98,87 @@ export const handleDropPiece = async (req: Request, res: Response) => {
       });
       const gameText = droppedAssets.find((droppedAsset) => droppedAsset.uniqueName === "gameText");
 
-      if (!gameText) throw "Text assets are missing. Please have an admin reset the board.";
-
       if (!shouldUpdateGame) {
-        gameText.updateCustomTextAsset({}, text);
+        if (gameText) gameText.updateCustomTextAsset({}, text);
         throw text;
       }
 
       const promises = [];
 
       const position = getPosition(claimedSpace, keyAsset.position);
-      promises.push(
-        dropWebImageAsset({
-          credentials,
-          layer0: `${process.env.S3_BUCKET}${visitorId === player1.visitorId ? "player1" : "player2"}.png`,
-          position: { x: Math.round(position.x), y: Math.round(position.y) },
-          uniqueName: "claimedSpace",
-        }),
-      );
+      await dropWebImageAsset({
+        credentials,
+        layer0: `${process.env.S3_BUCKET}${visitorId === player1.visitorId ? "player1" : "player2"}.png`,
+        position: { x: Math.round(position.x), y: Math.round(position.y) },
+        uniqueName: "claimedSpace",
+      });
 
-      const hasWinningCombo = await getGameStatus(
-        player1.visitorId === visitorId ? updatedData.player1.claimedSpaces : updatedData.player2.claimedSpaces,
-      );
-
-      if (hasWinningCombo) {
-        text = `${username} wins!`;
+      if (updatedData.player1.claimedSpaces.length + updatedData.player2.claimedSpaces.length === 41) {
+        text = "It's a draw! Press Reset to play again.";
         updatedData.isGameOver = true;
 
-        // drop crown
-        const keyAssetPosition = keyAsset.position;
-        const position = {
-          x: player1.visitorId === visitorId ? keyAssetPosition.x - 400 : keyAssetPosition.x + 400,
-          y: keyAssetPosition.y - 580,
+        const world = World.create(urlSlug, { credentials });
+        const boardCenter = {
+          x: keyAsset.position.x,
+          y: keyAsset.position.y - 300,
         };
         promises.push(
-          dropWebImageAsset({
-            credentials,
-            layer0: `${process.env.S3_BUCKET}crown.png`,
-            position,
-            uniqueName: "crown",
+          world.triggerParticle({
+            position: boardCenter,
+            name: "pastelConfetti_explosion",
           }),
         );
 
-        const visitor = await Visitor.create(visitorId, urlSlug, { credentials });
-        promises.push(visitor.triggerParticle({ name: "crown_float" }));
+        const uniqueKey =
+          player1.profileId > player2.profileId
+            ? `${player1.profileId}-${player2.profileId}`
+            : `${player2.profileId}-${player1.profileId}`;
+        analytics.push(
+          { analyticName: "ties", profileId: player1.profileId, urlSlug, uniqueKey },
+          { analyticName: "ties", profileId: player2.profileId, urlSlug, uniqueKey },
+          { analyticName: "completions", profileId: player1.profileId, urlSlug, uniqueKey: player1.profileId },
+          { analyticName: "completions", profileId: player2.profileId, urlSlug, uniqueKey: player2.profileId },
+        );
+      } else {
+        const hasWinningCombo = await getGameStatus(
+          player1.visitorId === visitorId ? updatedData.player1.claimedSpaces : updatedData.player2.claimedSpaces,
+        );
 
-        addNewRowToGoogleSheets([
-          {
-            displayName,
-            identityId,
-            event: "completions",
-            urlSlug,
-          },
-        ]);
+        if (hasWinningCombo) {
+          text = `${username} wins!`;
+          updatedData.isGameOver = true;
+
+          // drop crown
+          const keyAssetPosition = keyAsset.position;
+          const position = {
+            x: player1.visitorId === visitorId ? keyAssetPosition.x - 400 : keyAssetPosition.x + 400,
+            y: keyAssetPosition.y - 580,
+          };
+          promises.push(
+            dropWebImageAsset({
+              credentials,
+              layer0: `${process.env.S3_BUCKET}crown.png`,
+              position,
+              uniqueName: "crown",
+            }),
+          );
+
+          const visitor = await Visitor.create(visitorId, urlSlug, { credentials });
+          promises.push(visitor.triggerParticle({ name: "crown_float" }));
+
+          addNewRowToGoogleSheets([
+            {
+              displayName,
+              identityId,
+              event: "completions",
+              urlSlug,
+            },
+          ]);
+        }
       }
 
-      promises.push(keyAsset.updateDataObject(updatedData, { analytics }), gameText.updateCustomTextAsset({}, text));
+      promises.push(keyAsset.updateDataObject(updatedData, { analytics }));
+      if (gameText) promises.push(gameText.updateCustomTextAsset({}, text));
 
       await Promise.all(promises);
     } catch (error) {

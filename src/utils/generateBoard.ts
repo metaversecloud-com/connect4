@@ -63,7 +63,7 @@ export const generateBoard = async (credentials: Credentials) => {
     const [player1, player2, column1, column2, column3, column4, column5, column6, column7] = await Promise.all([
       dropWebImageAsset({
         credentials,
-        layer0: `${process.env.S3_BUCKET}player1.png`,
+        layer1: `${process.env.S3_BUCKET}player1.png`,
         position: {
           x: resetBtnCenter.x - 400,
           y: boardCenter.y - 200,
@@ -72,7 +72,7 @@ export const generateBoard = async (credentials: Credentials) => {
       }),
       dropWebImageAsset({
         credentials,
-        layer0: `${process.env.S3_BUCKET}player2.png`,
+        layer1: `${process.env.S3_BUCKET}player2.png`,
         position: {
           x: resetBtnCenter.x + 400,
           y: boardCenter.y - 200,
@@ -81,7 +81,7 @@ export const generateBoard = async (credentials: Credentials) => {
       }),
       dropWebImageAsset({
         credentials,
-        layer0: `${process.env.S3_BUCKET}selector.png`,
+        layer1: `${process.env.S3_BUCKET}selector.png`,
         position: {
           x: boardCenter.x - 255,
           y: boardCenter.y - 325,
@@ -90,7 +90,7 @@ export const generateBoard = async (credentials: Credentials) => {
       }),
       dropWebImageAsset({
         credentials,
-        layer0: `${process.env.S3_BUCKET}selector.png`,
+        layer1: `${process.env.S3_BUCKET}selector.png`,
         position: {
           x: boardCenter.x - 170,
           y: boardCenter.y - 325,
@@ -99,7 +99,7 @@ export const generateBoard = async (credentials: Credentials) => {
       }),
       dropWebImageAsset({
         credentials,
-        layer0: `${process.env.S3_BUCKET}selector.png`,
+        layer1: `${process.env.S3_BUCKET}selector.png`,
         position: {
           x: boardCenter.x - 85,
           y: boardCenter.y - 325,
@@ -108,7 +108,7 @@ export const generateBoard = async (credentials: Credentials) => {
       }),
       dropWebImageAsset({
         credentials,
-        layer0: `${process.env.S3_BUCKET}selector.png`,
+        layer1: `${process.env.S3_BUCKET}selector.png`,
         position: {
           x: boardCenter.x,
           y: boardCenter.y - 325,
@@ -117,7 +117,7 @@ export const generateBoard = async (credentials: Credentials) => {
       }),
       dropWebImageAsset({
         credentials,
-        layer0: `${process.env.S3_BUCKET}selector.png`,
+        layer1: `${process.env.S3_BUCKET}selector.png`,
         position: {
           x: boardCenter.x + 85,
           y: boardCenter.y - 325,
@@ -126,7 +126,7 @@ export const generateBoard = async (credentials: Credentials) => {
       }),
       dropWebImageAsset({
         credentials,
-        layer0: `${process.env.S3_BUCKET}selector.png`,
+        layer1: `${process.env.S3_BUCKET}selector.png`,
         position: {
           x: boardCenter.x + 170,
           y: boardCenter.y - 325,
@@ -135,7 +135,7 @@ export const generateBoard = async (credentials: Credentials) => {
       }),
       dropWebImageAsset({
         credentials,
-        layer0: `${process.env.S3_BUCKET}selector.png`,
+        layer1: `${process.env.S3_BUCKET}selector.png`,
         position: {
           x: boardCenter.x + 255,
           y: boardCenter.y - 325,
