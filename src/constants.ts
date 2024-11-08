@@ -19,4 +19,4 @@ export const defaultGameData = {
   turnCount: 0,
 };
 
-export const defaultGameText = "Click on a game piece to begin!";
+export const defaultGameText = "Click on a game piece on the left or right to begin!";
