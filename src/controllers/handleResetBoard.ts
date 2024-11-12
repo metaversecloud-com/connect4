@@ -102,12 +102,6 @@ export const handleResetBoard = async (req: Request, res: Response) => {
 
       if (isAdmin) promises.push(generateBoard(credentials));
 
-      const position = {
-        x: keyAsset.position.x,
-        y: keyAsset.position.y - 300,
-      };
-      promises.push(world.triggerParticle({ duration: 4, position, name: "blueSmoke_fog" }));
-
       await Promise.all(promises);
 
       return res.status(200).send({ message: "Game reset successfully" });
