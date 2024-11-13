@@ -91,13 +91,18 @@ export const handleResetBoard = async (req: Request, res: Response) => {
         credentials: { ...credentials, assetId },
       });
       promises.push(
-        droppedAsset.updateDataObject({
-          ...defaultGameData,
-          keyAssetId: assetId,
-          isResetInProgress: false,
-          resetCount: resetCount + 1,
-          sceneDropId,
-        }),
+        droppedAsset.updateDataObject(
+          {
+            ...defaultGameData,
+            keyAssetId: assetId,
+            isResetInProgress: false,
+            resetCount: resetCount + 1,
+            sceneDropId,
+          },
+          {
+            analytics: [{ analyticName: "resets", urlSlug }],
+          },
+        ),
       );
 
       if (isAdmin) promises.push(generateBoard(credentials));
