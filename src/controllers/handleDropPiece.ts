@@ -27,7 +27,7 @@ export const handleDropPiece = async (req: Request, res: Response) => {
     const column = parseInt(req.params.column);
     if (isNaN(column)) throw "Column id is required.";
 
-    const { keyAsset } = await getDroppedAssetDataObject(credentials);
+    const { keyAsset } = await getDroppedAssetDataObject(credentials, false);
 
     let {
       columns,
