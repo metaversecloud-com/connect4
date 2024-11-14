@@ -2,29 +2,32 @@ import { errorHandler, DroppedAsset, initializeDroppedAssetDataObject, World } f
 import { Credentials, WorldDataObjectType } from "../../types/index.js";
 import { DroppedAssetInterface } from "@rtsdk/topia";
 
-export const getDroppedAssetDataObject = async (credentials: Credentials) => {
+export const getDroppedAssetDataObject = async (credentials: Credentials, isKeyAsset: boolean) => {
   try {
     let { assetId, sceneDropId, urlSlug } = credentials;
-    let keyAssetId = assetId;
+    let keyAsset,
+      keyAssetId = assetId;
 
     const world = World.create(urlSlug, { credentials });
     await world.fetchDataObject();
     const dataObject = world.dataObject as WorldDataObjectType;
 
-    if (!sceneDropId) {
-      keyAssetId = assetId;
-      sceneDropId = assetId;
-    } else if (dataObject?.[sceneDropId]?.keyAssetId) {
-      keyAssetId = dataObject[sceneDropId].keyAssetId;
-    } else {
-      const droppedAssets: DroppedAssetInterface[] = await world.fetchDroppedAssetsBySceneDropId({
-        sceneDropId,
-      });
-      const keyAsset = droppedAssets.find((droppedAsset) => droppedAsset.uniqueName === "reset");
-      keyAssetId = keyAsset?.id;
+    if (!isKeyAsset) {
+      if (dataObject?.[sceneDropId]?.keyAssetId) {
+        // get keyAssetId from world data object if available
+        keyAssetId = dataObject[sceneDropId].keyAssetId;
+      } else {
+        // find key asset by sceneDropId and unique name
+        const droppedAssets: DroppedAssetInterface[] = await world.fetchDroppedAssetsBySceneDropId({
+          sceneDropId,
+        });
+        keyAsset = droppedAssets.find((droppedAsset) => droppedAsset.uniqueName === "reset");
+        if (!keyAsset) throw "No key asset with the unique name 'reset' found.";
+        keyAssetId = keyAsset?.id;
+      }
     }
 
-    if (!keyAssetId) throw "No key asset found.";
+    if (!sceneDropId) sceneDropId = keyAssetId;
 
     // store keyAssetId by sceneDropId in World data object so that it can be accessed by any clickable asset
     // this supports a scene being dropped with the board already created instead of just the Reset button
@@ -34,9 +37,12 @@ export const getDroppedAssetDataObject = async (credentials: Credentials) => {
       await world.updateDataObject({ [sceneDropId]: { keyAssetId } });
     }
 
-    const keyAsset = await DroppedAsset.get(keyAssetId, urlSlug, {
-      credentials: { ...credentials, assetId: keyAssetId },
-    });
+    if (!keyAsset?.id) {
+      keyAsset = await DroppedAsset.get(keyAssetId, urlSlug, {
+        credentials: { ...credentials, assetId: keyAssetId },
+      });
+    }
+
     const wasDataObjectInitialized = await initializeDroppedAssetDataObject(keyAsset, sceneDropId);
 
     return { keyAsset, wasDataObjectInitialized };
