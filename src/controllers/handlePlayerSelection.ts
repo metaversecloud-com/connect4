@@ -14,7 +14,7 @@ export const handlePlayerSelection = async (req: Request, res: Response) => {
     let text = "",
       shouldUpdateGame = true;
 
-    const { keyAsset } = await getDroppedAssetDataObject(credentials);
+    const { keyAsset } = await getDroppedAssetDataObject(credentials, false);
     const { keyAssetId, playerCount, player1, player2 } = keyAsset.dataObject as GameDataType;
 
     try {
