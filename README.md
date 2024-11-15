@@ -1,4 +1,4 @@
-# Bulletin Board
+# Connect 4
 
 ## Introduction / Summary
 

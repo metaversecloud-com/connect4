@@ -93,9 +93,7 @@ export const handleDropPiece = async (req: Request, res: Response) => {
       }
 
       const world = World.create(urlSlug, { credentials });
-      const droppedAssets: DroppedAssetInterface[] = await world.fetchDroppedAssetsBySceneDropId({
-        sceneDropId,
-      });
+      const droppedAssets: DroppedAssetInterface[] = await world.fetchDroppedAssetsBySceneDropId({ sceneDropId });
       const gameText = droppedAssets.find((droppedAsset) => droppedAsset.uniqueName === "gameText");
 
       if (!shouldUpdateGame) {

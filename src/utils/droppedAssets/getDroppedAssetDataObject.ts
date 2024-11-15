@@ -18,9 +18,7 @@ export const getDroppedAssetDataObject = async (credentials: Credentials, isKeyA
         keyAssetId = dataObject[sceneDropId].keyAssetId;
       } else {
         // find key asset by sceneDropId and unique name
-        const droppedAssets: DroppedAssetInterface[] = await world.fetchDroppedAssetsBySceneDropId({
-          sceneDropId,
-        });
+        const droppedAssets: DroppedAssetInterface[] = await world.fetchDroppedAssetsBySceneDropId({ sceneDropId });
         keyAsset = droppedAssets.find((droppedAsset) => droppedAsset.uniqueName === "reset");
         if (!keyAsset) throw "No key asset with the unique name 'reset' found.";
         keyAssetId = keyAsset?.id;
