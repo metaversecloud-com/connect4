@@ -32,9 +32,7 @@ export const handleResetBoard = async (req: Request, res: Response) => {
     const world = World.create(urlSlug, { credentials });
 
     // get all assets with matching sceneDropId for full board rebuild
-    droppedAssets = await world.fetchDroppedAssetsBySceneDropId({
-      sceneDropId,
-    });
+    droppedAssets = await world.fetchDroppedAssetsBySceneDropId({ sceneDropId });
     droppedAssets = droppedAssets.filter((item) => item.uniqueName !== "reset");
 
     const gameText = droppedAssets.find((droppedAsset) => droppedAsset.uniqueName === "gameText");
