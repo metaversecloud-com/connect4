@@ -164,6 +164,11 @@ export const handleDropPiece = async (req: Request, res: Response) => {
           const visitor = await Visitor.create(visitorId, urlSlug, { credentials });
           promises.push(visitor.triggerParticle({ name: "crown_float" }));
 
+          analytics.push(
+            { analyticName: "completions", profileId: player1.profileId, urlSlug, uniqueKey: player1.profileId },
+            { analyticName: "completions", profileId: player2.profileId, urlSlug, uniqueKey: player2.profileId },
+          );
+
           addNewRowToGoogleSheets([
             {
               displayName,
