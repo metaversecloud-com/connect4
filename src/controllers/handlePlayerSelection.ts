@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { errorHandler, getDroppedAssetDataObject, getCredentials, lockDataObject, World } from "../utils/index.js";
 import { GameDataType } from "../types/gameDataType.js";
-import { DroppedAssetInterface } from "@rtsdk/topia";
+import { DroppedAssetInterface, WorldActivityType } from "@rtsdk/topia";
 
 export const handlePlayerSelection = async (req: Request, res: Response) => {
   try {
@@ -25,6 +25,8 @@ export const handlePlayerSelection = async (req: Request, res: Response) => {
         return res.status(409).json({ message: "Player selection already in progress." });
       }
 
+      const world = World.create(urlSlug, { credentials });
+
       if (player2.visitorId === visitorId) {
         text = `You are already player 2`;
         shouldUpdateGame = false;
@@ -39,11 +41,12 @@ export const handlePlayerSelection = async (req: Request, res: Response) => {
         shouldUpdateGame = false;
       } else if ((isPlayer2 && player1.visitorId) || (!isPlayer2 && player2.visitorId)) {
         text = "Let the game begin!";
+        world.triggerActivity({ type: WorldActivityType.GAME_ON, assetId: keyAssetId });
       } else {
         text = "Find a second player!";
+        world.triggerActivity({ type: WorldActivityType.GAME_WAITING, assetId: keyAssetId });
       }
 
-      const world = World.create(urlSlug, { credentials });
       const droppedAssets: DroppedAssetInterface[] = await world.fetchDroppedAssetsBySceneDropId({ sceneDropId });
       const gameText = droppedAssets.find((droppedAsset) => droppedAsset.uniqueName === "gameText");
       const playerText = droppedAssets.find((droppedAsset) => droppedAsset.uniqueName === `player${playerId}Text`);
