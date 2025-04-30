@@ -41,10 +41,14 @@ export const handlePlayerSelection = async (req: Request, res: Response) => {
         shouldUpdateGame = false;
       } else if ((isPlayer2 && player1.visitorId) || (!isPlayer2 && player2.visitorId)) {
         text = "Let the game begin!";
-        world.triggerActivity({ type: WorldActivityType.GAME_ON, assetId: keyAssetId });
+        world.triggerActivity({ type: WorldActivityType.GAME_ON, assetId: keyAssetId }).catch((error) => {
+          console.error("Error triggering activity:", error);
+        });
       } else {
         text = "Find a second player!";
-        world.triggerActivity({ type: WorldActivityType.GAME_WAITING, assetId: keyAssetId });
+        world.triggerActivity({ type: WorldActivityType.GAME_WAITING, assetId: keyAssetId }).catch((error) => {
+          console.error("Error triggering activity:", error);
+        });
       }
 
       const droppedAssets: DroppedAssetInterface[] = await world.fetchDroppedAssetsBySceneDropId({ sceneDropId });
