@@ -120,12 +120,19 @@ export const handleDropPiece = async (req: Request, res: Response) => {
           x: keyAsset.position.x,
           y: keyAsset.position.y - 300,
         };
-        promises.push(
-          world.triggerParticle({
+
+        world
+          .triggerParticle({
             position: boardCenter,
             name: "pastelConfetti_explosion",
-          }),
-        );
+          })
+          .catch((error) =>
+            errorHandler({
+              error,
+              functionName: "handleDropPiece",
+              message: "Error triggering particle effects",
+            }),
+          );
 
         const uniqueKey =
           player1.profileId > player2.profileId
@@ -162,7 +169,14 @@ export const handleDropPiece = async (req: Request, res: Response) => {
           );
 
           const visitor = await Visitor.create(visitorId, urlSlug, { credentials });
-          promises.push(visitor.triggerParticle({ name: "crown_float" }));
+
+          visitor.triggerParticle({ name: "crown_float" }).catch((error) =>
+            errorHandler({
+              error,
+              functionName: "handleDropPiece",
+              message: "Error triggering particle effects",
+            }),
+          );
 
           analytics.push(
             { analyticName: "completions", profileId: player1.profileId, urlSlug, uniqueKey: player1.profileId },
