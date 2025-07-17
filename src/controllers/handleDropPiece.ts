@@ -67,8 +67,7 @@ export const handleDropPiece = async (req: Request, res: Response) => {
 
     try {
       try {
-        const timestamp = new Date(Math.round(new Date().getTime() / 10000) * 10000);
-        await lockDataObject(`${keyAssetId}-${resetCount}-${turnCount}-${timestamp}`, keyAsset);
+        await lockDataObject(`${keyAssetId}-${resetCount}-${turnCount}`, keyAsset);
       } catch (error) {
         return res.status(409).json({ message: "Move already in progress." });
       }
