@@ -1,6 +1,5 @@
 import { errorHandler, DroppedAsset, initializeDroppedAssetDataObject, World } from "../index.js";
 import { Credentials, WorldDataObjectType } from "../../types/index.js";
-import { DroppedAssetInterface } from "@rtsdk/topia";
 
 export const getDroppedAssetDataObject = async (credentials: Credentials, isKeyAsset: boolean) => {
   try {
@@ -18,8 +17,7 @@ export const getDroppedAssetDataObject = async (credentials: Credentials, isKeyA
         keyAssetId = dataObject[sceneDropId].keyAssetId;
       } else {
         // find key asset by sceneDropId and unique name
-        const droppedAssets: DroppedAssetInterface[] = await world.fetchDroppedAssetsBySceneDropId({ sceneDropId });
-        keyAsset = droppedAssets.find((droppedAsset) => droppedAsset.uniqueName === "reset");
+        keyAsset = await DroppedAsset.getWithUniqueName("reset", urlSlug, process.env.INTERACTIVE_SECRET!, credentials);
         if (!keyAsset) throw "No key asset with the unique name 'reset' found.";
         keyAssetId = keyAsset?.id;
       }
