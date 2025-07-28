@@ -7,7 +7,7 @@ export const handlePlayerSelection = async (req: Request, res: Response) => {
   try {
     const playerId = req.params.player;
     const isPlayer2 = parseInt(playerId) === 2;
-    const credentials = getCredentials(req.body);
+    const credentials = req.credentials;
     const { profileId, sceneDropId, urlSlug, visitorId } = credentials;
     const { username } = req.body;
 
