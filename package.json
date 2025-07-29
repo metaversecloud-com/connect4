@@ -46,5 +46,6 @@
   },
   "keywords": [],
   "license": "ISC",
-  "type": "module"
+  "type": "module",
+  "workspaces": ["server"]
 }
