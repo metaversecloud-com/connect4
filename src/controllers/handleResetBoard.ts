@@ -14,16 +14,18 @@ import { DroppedAssetInterface, VisitorInterface } from "@rtsdk/topia";
 export const handleResetBoard = async (req: Request, res: Response) => {
   try {
     const credentials = req.credentials;
-    const { assetId, sceneDropId, urlSlug, visitorId } = credentials;
+    const { assetId, urlSlug, visitorId } = credentials;
 
     const visitor: VisitorInterface = await Visitor.get(visitorId, urlSlug, { credentials });
     const isAdmin = visitor.isAdmin;
 
-    const { keyAsset, wasDataObjectInitialized } = await getDroppedAssetDataObject(credentials, false);
+    // Get the resolved sceneDropId from getDroppedAssetDataObject
+    // This ensures we use a valid sceneDropId even if credentials.sceneDropId is empty
+    const { keyAsset, wasDataObjectInitialized, sceneDropId } = await getDroppedAssetDataObject(credentials, false);
     const { lastInteraction, player1, player2, resetCount } = keyAsset.dataObject as GameDataType;
 
     if (wasDataObjectInitialized) {
-      await generateBoard(credentials);
+      await generateBoard({ ...credentials, sceneDropId });
       return res.status(200).send({ message: "Game created successfully" });
     }
 
@@ -32,6 +34,7 @@ export const handleResetBoard = async (req: Request, res: Response) => {
     const world = World.create(urlSlug, { credentials });
 
     // get all assets with matching sceneDropId for full board rebuild
+    // Using the resolved sceneDropId from getDroppedAssetDataObject, not from credentials
     droppedAssets = await world.fetchDroppedAssetsBySceneDropId({ sceneDropId });
     droppedAssets = droppedAssets.filter((item) => item.uniqueName !== "reset");
 
@@ -103,7 +106,7 @@ export const handleResetBoard = async (req: Request, res: Response) => {
         ),
       );
 
-      if (isAdmin) promises.push(generateBoard(credentials));
+      if (isAdmin) promises.push(generateBoard({ ...credentials, sceneDropId }));
 
       await Promise.all(promises);
 

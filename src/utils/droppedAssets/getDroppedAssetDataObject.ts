@@ -23,7 +23,14 @@ export const getDroppedAssetDataObject = async (credentials: Credentials, isKeyA
       }
     }
 
+    // If sceneDropId is not provided, use keyAssetId as the sceneDropId
+    // This ensures we always have a valid sceneDropId for asset queries
     if (!sceneDropId) sceneDropId = keyAssetId;
+
+    // Validate that we have a valid sceneDropId before proceeding
+    if (!sceneDropId || sceneDropId.trim() === "") {
+      throw "Unable to determine a valid sceneDropId. This is required to safely query assets.";
+    }
 
     // store keyAssetId by sceneDropId in World data object so that it can be accessed by any clickable asset
     // this supports a scene being dropped with the board already created instead of just the Reset button
@@ -41,7 +48,8 @@ export const getDroppedAssetDataObject = async (credentials: Credentials, isKeyA
 
     const wasDataObjectInitialized = await initializeDroppedAssetDataObject(keyAsset, sceneDropId);
 
-    return { keyAsset, wasDataObjectInitialized };
+    // Return the resolved sceneDropId so callers can use it for subsequent queries
+    return { keyAsset, wasDataObjectInitialized, sceneDropId };
   } catch (error) {
     return errorHandler({
       error,

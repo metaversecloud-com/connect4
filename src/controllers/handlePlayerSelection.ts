@@ -8,13 +8,15 @@ export const handlePlayerSelection = async (req: Request, res: Response) => {
     const playerId = req.params.player;
     const isPlayer2 = parseInt(playerId) === 2;
     const credentials = req.credentials;
-    const { profileId, sceneDropId, urlSlug, visitorId } = credentials;
+    const { profileId, urlSlug, visitorId } = credentials;
     const { username } = req.body;
 
     let text = "",
       shouldUpdateGame = true;
 
-    const { keyAsset } = await getDroppedAssetDataObject(credentials, false);
+    // Get the resolved sceneDropId from getDroppedAssetDataObject
+    // This ensures we use a valid sceneDropId even if credentials.sceneDropId is empty
+    const { keyAsset, sceneDropId } = await getDroppedAssetDataObject(credentials, false);
     const { keyAssetId, playerCount, player1, player2 } = keyAsset.dataObject as GameDataType;
 
     try {
