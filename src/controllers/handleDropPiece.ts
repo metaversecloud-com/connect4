@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import {
   dropWebImageAsset,
   errorHandler,
-  getCredentials,
   getDroppedAssetDataObject,
   getGameStatus,
   lockDataObject,
@@ -47,16 +46,16 @@ export const handleDropPiece = async (req: Request, res: Response) => {
       column === 0
         ? 0
         : column === 1
-        ? 6
-        : column === 2
-        ? 12
-        : column === 3
-        ? 18
-        : column === 4
-        ? 24
-        : column === 5
-        ? 30
-        : 36;
+          ? 6
+          : column === 2
+            ? 12
+            : column === 3
+              ? 18
+              : column === 4
+                ? 24
+                : column === 5
+                  ? 30
+                  : 36;
     const claimedSpace = columnStart + columns[column].length;
 
     const updatedData = {

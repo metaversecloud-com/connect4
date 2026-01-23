@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { errorHandler, getDroppedAssetDataObject, getCredentials, lockDataObject, World } from "../utils/index.js";
+import { errorHandler, getDroppedAssetDataObject, lockDataObject, World } from "../utils/index.js";
 import { GameDataType } from "../types/gameDataType.js";
 import { DroppedAssetInterface, WorldActivityType } from "@rtsdk/topia";
 

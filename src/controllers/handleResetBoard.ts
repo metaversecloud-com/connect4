@@ -19,7 +19,7 @@ export const handleResetBoard = async (req: Request, res: Response) => {
     const visitor: VisitorInterface = await Visitor.get(visitorId, urlSlug, { credentials });
     const isAdmin = visitor.isAdmin;
 
-    const { keyAsset, wasDataObjectInitialized } = await getDroppedAssetDataObject(credentials, false);
+    const { keyAsset, wasDataObjectInitialized } = await getDroppedAssetDataObject(credentials, true);
     const { lastInteraction, player1, player2, resetCount } = keyAsset.dataObject as GameDataType;
 
     if (wasDataObjectInitialized) {
