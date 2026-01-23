@@ -17,7 +17,7 @@ import { DroppedAssetInterface } from "@rtsdk/topia";
 export const handleDropPiece = async (req: Request, res: Response) => {
   try {
     const credentials = req.credentials;
-    const { displayName, identityId, sceneDropId, urlSlug, visitorId } = credentials;
+    const { displayName, identityId, urlSlug, visitorId } = credentials;
     const { username } = req.body;
 
     let text = "",
@@ -27,7 +27,8 @@ export const handleDropPiece = async (req: Request, res: Response) => {
     const column = parseInt(req.params.column);
     if (isNaN(column)) throw "Column id is required.";
 
-    const { keyAsset } = await getDroppedAssetDataObject(credentials, false);
+    // Get the resolved sceneDropId from getDroppedAssetDataObject
+    const { keyAsset, sceneDropId } = await getDroppedAssetDataObject(credentials, false);
 
     let {
       columns,
