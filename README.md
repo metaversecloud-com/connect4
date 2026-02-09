@@ -6,13 +6,6 @@ Connect 4 is a completely on-canvas game where two players take turns dropping p
 
 ## Built With
 
-### Client
-
-![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
-![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)
-![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
-
 ### Server
 
 ![Node.js](https://img.shields.io/badge/node.js-%2343853D.svg?style=for-the-badge&logo=node.js&logoColor=white)
@@ -41,17 +34,17 @@ Connect 4 is a completely on-canvas game where two players take turns dropping p
 
 The app dynamically generates assets with the following unique names:
 
-| Unique Name | Description |
-|-------------|-------------|
-| `board` | The board background image |
-| `gameText` | Game status message |
-| `player1Text` | Player 1 name display |
-| `player2Text` | Player 2 name display |
-| `player1` | Player 1 selection button |
-| `player2` | Player 2 selection button |
-| `selector` | Column drop arrows (7 total, all share this name) |
-| `claimedSpace` | Game pieces placed on board |
-| `crown` | Victory crown for winner |
+| Unique Name    | Description                                       |
+| -------------- | ------------------------------------------------- |
+| `board`        | The board background image                        |
+| `gameText`     | Game status message                               |
+| `player1Text`  | Player 1 name display                             |
+| `player2Text`  | Player 2 name display                             |
+| `player1`      | Player 1 selection button                         |
+| `player2`      | Player 2 selection button                         |
+| `selector`     | Column drop arrows (7 total, all share this name) |
+| `claimedSpace` | Game pieces placed on board                       |
+| `crown`        | Victory crown for winner                          |
 
 ## Developers
 
