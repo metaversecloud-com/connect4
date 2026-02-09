@@ -4,6 +4,20 @@
 
 Connect 4 is a completely on-canvas game where two players take turns dropping pieces in an attempt to connect 4 in a row.
 
+## Built With
+
+### Client
+
+![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
+![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)
+![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
+
+### Server
+
+![Node.js](https://img.shields.io/badge/node.js-%2343853D.svg?style=for-the-badge&logo=node.js&logoColor=white)
+![Express](https://img.shields.io/badge/express-%23000000.svg?style=for-the-badge&logo=express&logoColor=white)
+
 ## Key Features
 
 ### Canvas elements & interactions
@@ -21,7 +35,25 @@ Connect 4 is a completely on-canvas game where two players take turns dropping p
 - Key Asset: the data object attached to the Reset Button key asset can stores all of the game play information including current players, player turn status, and game status.
 - World: the data object attached to the world will store the key asset id of each dropped scene indexed by `dropSceneId`. This allows world builders the option of dropping just the key asset and clicking Reset for the first time to build the board OR dropping the entire board as a prebuilt scene removing the need to click Reset to build the board for the first time.
 
-## Developers:
+## Implementation Requirements
+
+### Required Assets with Unique Names
+
+The app dynamically generates assets with the following unique names:
+
+| Unique Name | Description |
+|-------------|-------------|
+| `board` | The board background image |
+| `gameText` | Game status message |
+| `player1Text` | Player 1 name display |
+| `player2Text` | Player 2 name display |
+| `player1` | Player 1 selection button |
+| `player2` | Player 2 selection button |
+| `selector` | Column drop arrows (7 total, all share this name) |
+| `claimedSpace` | Game pieces placed on board |
+| `crown` | Victory crown for winner |
+
+## Developers
 
 ### Getting Started
 
