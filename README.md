@@ -4,6 +4,13 @@
 
 Connect 4 is a completely on-canvas game where two players take turns dropping pieces in an attempt to connect 4 in a row.
 
+## Built With
+
+### Server
+
+![Node.js](https://img.shields.io/badge/node.js-%2343853D.svg?style=for-the-badge&logo=node.js&logoColor=white)
+![Express](https://img.shields.io/badge/express-%23000000.svg?style=for-the-badge&logo=express&logoColor=white)
+
 ## Key Features
 
 ### Canvas elements & interactions
@@ -21,7 +28,45 @@ Connect 4 is a completely on-canvas game where two players take turns dropping p
 - Key Asset: the data object attached to the Reset Button key asset can stores all of the game play information including current players, player turn status, and game status.
 - World: the data object attached to the world will store the key asset id of each dropped scene indexed by `dropSceneId`. This allows world builders the option of dropping just the key asset and clicking Reset for the first time to build the board OR dropping the entire board as a prebuilt scene removing the need to click Reset to build the board for the first time.
 
-## Developers:
+## Implementation Requirements
+
+### Required Assets with Unique Names
+
+The app dynamically generates assets with the following unique names:
+
+| Unique Name    | Description                                       |
+| -------------- | ------------------------------------------------- |
+| `board`        | The board background image                        |
+| `gameText`     | Game status message                               |
+| `player1Text`  | Player 1 name display                             |
+| `player2Text`  | Player 2 name display                             |
+| `player1`      | Player 1 selection button                         |
+| `player2`      | Player 2 selection button                         |
+| `selector`     | Column drop arrows (7 total, all share this name) |
+| `claimedSpace` | Game pieces placed on board                       |
+| `crown`        | Victory crown for winner                          |
+
+## Environment Variables
+
+Create a `.env` file in the root directory. See `.env-example` for a template.
+
+| Variable                    | Description                                                                        | Required |
+| --------------------------- | ---------------------------------------------------------------------------------- | -------- |
+| `NODE_ENV`                  | Node environment                                                                   | No       |
+| `PORT`                      | Server port                                                                        | No       |
+| `APP_URL`                   | Public URL for the app API, used for webhook callbacks                             | Yes      |
+| `APP_VERSION`               | App version identifier                                                             | Yes      |
+| `S3_BUCKET`                 | S3 bucket URL for game assets                                                      | Yes      |
+| `TEXT_ASSET_ID`             | Asset ID template for text assets in Topia                                         | Yes      |
+| `WEB_IMAGE_ASSET_ID`        | Asset ID template for web image assets in Topia                                    | Yes      |
+| `INSTANCE_DOMAIN`           | Topia API domain (`api.topia.io` for production, `api-stage.topia.io` for staging) | Yes      |
+| `INTERACTIVE_KEY`           | Topia interactive app key                                                          | Yes      |
+| `INTERACTIVE_SECRET`        | Topia interactive app secret                                                       | Yes      |
+| `GOOGLESHEETS_CLIENT_EMAIL` | Google service account email for analytics                                         | No       |
+| `GOOGLESHEETS_SHEET_ID`     | Google Sheet ID for analytics                                                      | No       |
+| `GOOGLESHEETS_PRIVATE_KEY`  | Google service account private key                                                 | No       |
+
+## Developers
 
 ### Getting Started
 
@@ -30,14 +75,7 @@ Connect 4 is a completely on-canvas game where two players take turns dropping p
 
 ### Add your .env environmental variables
 
-```json
-APP_URL
-INSTANCE_DOMAIN=api.topia.io
-INSTANCE_PROTOCOL=https
-INTERACTIVE_KEY=xxxxxxxxxxxxx
-INTERACTIVE_SECRET=xxxxxxxxxxxxxx
-S3_BUCKET=https://mybucket.s3.amazonaws.com/
-```
+See [Environment Variables](#environment-variables) above.
 
 ### Where to find INTERACTIVE_KEY and INTERACTIVE_SECRET
 
