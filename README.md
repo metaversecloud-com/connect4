@@ -46,6 +46,26 @@ The app dynamically generates assets with the following unique names:
 | `claimedSpace` | Game pieces placed on board                       |
 | `crown`        | Victory crown for winner                          |
 
+## Environment Variables
+
+Create a `.env` file in the root directory. See `.env-example` for a template.
+
+| Variable                    | Description                                                                        | Required |
+| --------------------------- | ---------------------------------------------------------------------------------- | -------- |
+| `NODE_ENV`                  | Node environment                                                                   | No       |
+| `PORT`                      | Server port                                                                        | No       |
+| `APP_URL`                   | Public URL for the app API, used for webhook callbacks                             | Yes      |
+| `APP_VERSION`               | App version identifier                                                             | Yes      |
+| `S3_BUCKET`                 | S3 bucket URL for game assets                                                      | Yes      |
+| `TEXT_ASSET_ID`             | Asset ID template for text assets in Topia                                         | Yes      |
+| `WEB_IMAGE_ASSET_ID`        | Asset ID template for web image assets in Topia                                    | Yes      |
+| `INSTANCE_DOMAIN`           | Topia API domain (`api.topia.io` for production, `api-stage.topia.io` for staging) | Yes      |
+| `INTERACTIVE_KEY`           | Topia interactive app key                                                          | Yes      |
+| `INTERACTIVE_SECRET`        | Topia interactive app secret                                                       | Yes      |
+| `GOOGLESHEETS_CLIENT_EMAIL` | Google service account email for analytics                                         | No       |
+| `GOOGLESHEETS_SHEET_ID`     | Google Sheet ID for analytics                                                      | No       |
+| `GOOGLESHEETS_PRIVATE_KEY`  | Google service account private key                                                 | No       |
+
 ## Developers
 
 ### Getting Started
@@ -55,14 +75,7 @@ The app dynamically generates assets with the following unique names:
 
 ### Add your .env environmental variables
 
-```json
-APP_URL
-INSTANCE_DOMAIN=api.topia.io
-INSTANCE_PROTOCOL=https
-INTERACTIVE_KEY=xxxxxxxxxxxxx
-INTERACTIVE_SECRET=xxxxxxxxxxxxxx
-S3_BUCKET=https://mybucket.s3.amazonaws.com/
-```
+See [Environment Variables](#environment-variables) above.
 
 ### Where to find INTERACTIVE_KEY and INTERACTIVE_SECRET
 
