@@ -29,6 +29,7 @@ export const dropTextAsset = async ({
     position,
     sceneDropId,
     text,
+    textWidth: 500,
     uniqueName,
     urlSlug,
     yOrderAdjust: 500,

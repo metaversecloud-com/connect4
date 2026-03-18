@@ -45,7 +45,7 @@ export const generateBoard = async (credentials: Credentials) => {
           y: boardCenter.y - 130,
         },
         style: { textSize: 20, textWidth: 150 },
-        text: "",
+        text: "Player One",
         uniqueName: `player1Text`,
       }),
       dropTextAsset({
@@ -55,7 +55,7 @@ export const generateBoard = async (credentials: Credentials) => {
           y: boardCenter.y - 130,
         },
         style: { textSize: 20, textWidth: 150 },
-        text: "",
+        text: "Player Two",
         uniqueName: `player2Text`,
       }),
     ]);

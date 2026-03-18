@@ -19,10 +19,6 @@ export const handleDropPiece = async (req: Request, res: Response) => {
     const { displayName, identityId, sceneDropId, urlSlug, visitorId } = credentials;
     const { username } = req.body;
 
-    let text = "",
-      shouldUpdateGame = false,
-      analytics = [];
-
     const column = parseInt(req.params.column);
     if (isNaN(column)) throw "Column id is required.";
 
@@ -39,6 +35,10 @@ export const handleDropPiece = async (req: Request, res: Response) => {
       resetCount,
       turnCount,
     } = keyAsset.dataObject as GameDataType;
+
+    let text = `It's ${lastPlayerTurn === player1.visitorId ? player1.username : player2.username}'s turn`,
+      shouldUpdateGame = false,
+      analytics = [];
 
     if (isResetInProgress) throw "Reset in progress.";
 
@@ -72,16 +72,16 @@ export const handleDropPiece = async (req: Request, res: Response) => {
       }
 
       if (isGameOver) {
-        text = "Game over! Press Reset to play again.";
+        text = "Game over! Press Reset to play again";
       } else if (!player1.visitorId || !player2.visitorId) {
-        text = "Two players are needed to get started.";
+        text = "Two players are needed to get started";
       } else if (player1.visitorId !== visitorId && player2.visitorId !== visitorId) {
-        text = "Game in progress.";
+        text = "Game in progress";
       } else if (columns[column].length === 6) {
-        text = "Cannot place your move here.";
+        text = "Cannot place your move here";
       } else if (lastPlayerTurn === visitorId) {
         const username = player2.visitorId === visitorId ? player1.username : player2.username;
-        text = `It's ${username}'s turn.`;
+        text = `It's ${username}'s turn`;
       } else {
         updatedData.lastPlayerTurn = visitorId;
         updatedData.columns[column]?.push(visitorId);
