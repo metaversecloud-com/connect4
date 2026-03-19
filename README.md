@@ -23,6 +23,23 @@ Connect 4 is a completely on-canvas game where two players take turns dropping p
 
 - Reset Button: Clicking on the Reset Button as an admin will remove all assets and rebuild the board completely. This is especially helpful if an interactive asset has accidentally been deleted.
 
+### Required Assets with Unique Names
+
+The app dynamically generates assets using the following unique names:
+
+| Unique Name    | Description                                        |
+| -------------- | -------------------------------------------------- |
+| `reset`        | Key asset reset button                             |
+| `board`        | The board background image                         |
+| `gameText`     | Main game status message                           |
+| `player1Text`  | Player 1 name display                              |
+| `player2Text`  | Player 2 name display                              |
+| `player1`      | Player 1 selection button (red piece)              |
+| `player2`      | Player 2 selection button (yellow piece)           |
+| `selector`     | Column drop arrows (7 total, one per column)       |
+| `claimedSpace` | Player pieces placed on the board during gameplay  |
+| `crown`        | Victory crown for the winner                       |
+
 ### Data objects
 
 - Key Asset: the data object attached to the Reset Button key asset can stores all of the game play information including current players, player turn status, and game status.
