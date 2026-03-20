@@ -66,19 +66,6 @@ export const handleResetBoard = async (req: Request, res: Response) => {
         throw "You must be either a player or admin to reset the board";
       }
 
-      if (!isAdmin) {
-        const p1text = droppedAssets.find((droppedAsset) => droppedAsset.uniqueName === "player1Text");
-        const p2text = droppedAssets.find((droppedAsset) => droppedAsset.uniqueName === "player2Text");
-
-        if (p1text) promises.push(p1text.updateCustomTextAsset({}, "Player 1"));
-        if (p2text) promises.push(p2text.updateCustomTextAsset({}, "Player 2"));
-        if (gameTextAsset) promises.push(gameTextAsset.updateCustomTextAsset({}, defaultGameText));
-
-        droppedAssets = droppedAssets.filter(
-          (item) => item.uniqueName === "claimedSpace" || item.uniqueName === "crown",
-        );
-      }
-
       for (const droppedAsset in droppedAssets) droppedAssetIds.push(droppedAssets[droppedAsset].id);
       if (droppedAssetIds.length > 0) {
         promises.push(World.deleteDroppedAssets(urlSlug, droppedAssetIds, process.env.INTERACTIVE_SECRET, credentials));
@@ -103,7 +90,7 @@ export const handleResetBoard = async (req: Request, res: Response) => {
         ),
       );
 
-      if (isAdmin) promises.push(generateBoard(credentials));
+      promises.push(generateBoard(credentials));
 
       await Promise.all(promises);
 
