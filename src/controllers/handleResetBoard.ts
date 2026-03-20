@@ -35,9 +35,9 @@ export const handleResetBoard = async (req: Request, res: Response) => {
     droppedAssets = await world.fetchDroppedAssetsBySceneDropId({ sceneDropId });
     droppedAssets = droppedAssets.filter((item) => item.uniqueName !== "reset");
 
-    const gameText = droppedAssets.find((droppedAsset) => droppedAsset.uniqueName === "gameText");
+    const gameTextAsset = droppedAssets.find((droppedAsset) => droppedAsset.uniqueName === "gameText");
 
-    if (gameText) await gameText.updateCustomTextAsset({}, "Reset in progress...");
+    if (gameTextAsset) await gameTextAsset.updateCustomTextAsset({}, "Reset in progress...");
 
     try {
       try {
@@ -70,9 +70,9 @@ export const handleResetBoard = async (req: Request, res: Response) => {
         const p1text = droppedAssets.find((droppedAsset) => droppedAsset.uniqueName === "player1Text");
         const p2text = droppedAssets.find((droppedAsset) => droppedAsset.uniqueName === "player2Text");
 
-        if (p1text) promises.push(p1text.updateCustomTextAsset({}, ""));
-        if (p2text) promises.push(p2text.updateCustomTextAsset({}, ""));
-        if (gameText) promises.push(gameText.updateCustomTextAsset({}, defaultGameText));
+        if (p1text) promises.push(p1text.updateCustomTextAsset({}, "Player 1"));
+        if (p2text) promises.push(p2text.updateCustomTextAsset({}, "Player 2"));
+        if (gameTextAsset) promises.push(gameTextAsset.updateCustomTextAsset({}, defaultGameText));
 
         droppedAssets = droppedAssets.filter(
           (item) => item.uniqueName === "claimedSpace" || item.uniqueName === "crown",
@@ -109,7 +109,7 @@ export const handleResetBoard = async (req: Request, res: Response) => {
 
       return res.status(200).send({ message: "Game reset successfully" });
     } catch (error) {
-      if (gameText) gameText.updateCustomTextAsset({}, "");
+      if (gameTextAsset) await gameTextAsset.updateCustomTextAsset({}, defaultGameText);
       await keyAsset.updateDataObject({ isResetInProgress: false, resetCount: resetCount + 1 });
       throw error;
     }
