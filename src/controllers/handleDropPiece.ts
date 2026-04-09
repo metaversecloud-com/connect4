@@ -98,7 +98,7 @@ export const handleDropPiece = async (req: Request, res: Response) => {
 
       const gameText = droppedAssets[0];
       if (!shouldUpdateGame) {
-        if (gameText) gameText.updateCustomTextAsset({}, text);
+        if (gameText) await gameText.updateCustomTextAsset({}, text);
         throw text;
       }
 

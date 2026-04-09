@@ -17,6 +17,7 @@ export const initializeDroppedAssetDataObject = async (droppedAsset, sceneDropId
         },
         { lock: { lockId, releaseLock: true } },
       );
+      await droppedAsset.fetchDataObject();
     }
 
     return wasDataObjectInitialized;
