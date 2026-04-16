@@ -99,7 +99,7 @@ export const handleDropPiece = async (req: Request, res: Response) => {
       const gameText = droppedAssets[0];
       if (!shouldUpdateGame) {
         if (gameText) await gameText.updateCustomTextAsset({}, text);
-        throw text;
+        return console.log("Drop piece invalid: ", text);
       }
 
       const promises = [];
