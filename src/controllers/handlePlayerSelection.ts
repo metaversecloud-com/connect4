@@ -72,7 +72,7 @@ export const handlePlayerSelection = async (req: Request, res: Response) => {
               message: "Error updating game text asset",
             }),
           );
-        return console.warn(text);
+        return console.log("Player selection invalid: ", text);
       }
 
       const promises = [];
