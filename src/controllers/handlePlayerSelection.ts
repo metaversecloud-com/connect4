@@ -64,7 +64,7 @@ export const handlePlayerSelection = async (req: Request, res: Response) => {
       const playerText = droppedAssets.find((droppedAsset) => droppedAsset.uniqueName === `player${playerId}Text`);
 
       if (!shouldUpdateGame) {
-        if (gameText)
+        if (gameText) {
           await gameText.updateCustomTextAsset({}, text).catch((error) =>
             errorHandler({
               error,
@@ -72,6 +72,8 @@ export const handlePlayerSelection = async (req: Request, res: Response) => {
               message: "Error updating game text asset",
             }),
           );
+        }
+        await keyAsset.updateDataObject({ playerCount: playerCount + 1 });
         return console.log("Player selection invalid: ", text);
       }
 

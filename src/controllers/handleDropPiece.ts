@@ -98,7 +98,7 @@ export const handleDropPiece = async (req: Request, res: Response) => {
 
       const gameText = droppedAssets[0];
       if (!shouldUpdateGame) {
-        if (gameText)
+        if (gameText) {
           await gameText.updateCustomTextAsset({}, text).catch((error) =>
             errorHandler({
               error,
@@ -106,6 +106,8 @@ export const handleDropPiece = async (req: Request, res: Response) => {
               message: "Error updating game text asset",
             }),
           );
+        }
+        await keyAsset.updateDataObject({ turnCount: turnCount + 1 });
         return console.log("Drop piece invalid: ", text);
       }
 
