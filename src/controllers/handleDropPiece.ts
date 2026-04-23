@@ -98,8 +98,17 @@ export const handleDropPiece = async (req: Request, res: Response) => {
 
       const gameText = droppedAssets[0];
       if (!shouldUpdateGame) {
-        if (gameText) await gameText.updateCustomTextAsset({}, text);
-        throw text;
+        if (gameText) {
+          await gameText.updateCustomTextAsset({}, text).catch((error) =>
+            errorHandler({
+              error,
+              functionName: "handleDropPiece",
+              message: "Error updating game text asset",
+            }),
+          );
+        }
+        await keyAsset.updateDataObject({ turnCount: turnCount + 1 });
+        return console.log("Drop piece invalid: ", text);
       }
 
       const promises = [];
@@ -196,7 +205,16 @@ export const handleDropPiece = async (req: Request, res: Response) => {
       }
 
       promises.push(keyAsset.updateDataObject(updatedData, { analytics }));
-      if (gameText) promises.push(gameText.updateCustomTextAsset({}, text));
+      if (gameText)
+        promises.push(
+          gameText.updateCustomTextAsset({}, text).catch((error) =>
+            errorHandler({
+              error,
+              functionName: "handleDropPiece",
+              message: "Error updating game text asset",
+            }),
+          ),
+        );
 
       await Promise.all(promises);
     } catch (error) {

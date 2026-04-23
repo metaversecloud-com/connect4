@@ -64,8 +64,17 @@ export const handlePlayerSelection = async (req: Request, res: Response) => {
       const playerText = droppedAssets.find((droppedAsset) => droppedAsset.uniqueName === `player${playerId}Text`);
 
       if (!shouldUpdateGame) {
-        if (gameText) gameText.updateCustomTextAsset({}, text);
-        throw text;
+        if (gameText) {
+          await gameText.updateCustomTextAsset({}, text).catch((error) =>
+            errorHandler({
+              error,
+              functionName: "handlePlayerSelection",
+              message: "Error updating game text asset",
+            }),
+          );
+        }
+        await keyAsset.updateDataObject({ playerCount: playerCount + 1 });
+        return console.log("Player selection invalid: ", text);
       }
 
       const promises = [];
@@ -81,8 +90,26 @@ export const handlePlayerSelection = async (req: Request, res: Response) => {
           },
         ),
       );
-      if (playerText) promises.push(playerText.updateCustomTextAsset({}, username));
-      if (gameText) promises.push(gameText.updateCustomTextAsset({}, text));
+      if (playerText)
+        promises.push(
+          playerText.updateCustomTextAsset({}, username).catch((error) =>
+            errorHandler({
+              error,
+              functionName: "handlePlayerSelection",
+              message: "Error updating player text asset",
+            }),
+          ),
+        );
+      if (gameText)
+        promises.push(
+          gameText.updateCustomTextAsset({}, text).catch((error) =>
+            errorHandler({
+              error,
+              functionName: "handlePlayerSelection",
+              message: "Error updating game text asset",
+            }),
+          ),
+        );
       await Promise.all(promises);
     } catch (error) {
       await keyAsset.updateDataObject({ playerCount: playerCount + 1 });
