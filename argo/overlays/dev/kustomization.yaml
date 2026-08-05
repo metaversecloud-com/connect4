@@ -26,4 +26,4 @@ patches:
 images:
   - name: connect40
     newName: 368076259134.dkr.ecr.us-east-1.amazonaws.com/sdk-example
-    digest: sha256:67b4ef28d9acae5818d95f74b4910080095d4d7e63816f00206c79154a33675e
+    digest: sha256:4c264f233eadba34c9bff9aca40fdc1cb5e2a43c2ebcdbb3bd022ea042677b45
