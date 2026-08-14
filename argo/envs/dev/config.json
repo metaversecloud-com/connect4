@@ -1,6 +1,7 @@
 {
   "app": "connect4",
   "env": "dev",
+  "targetRevision": "dev",
   "clusterName": "Topia-dev-SDK-Apps",
   "clusterType": "eks",
   "namespace": "sdk-apps-dev",
