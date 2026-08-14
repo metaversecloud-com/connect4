@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: connect40-config
+  labels:
+    app.kubernetes.io/name: connect40
+data:
+  S3_BUCKET: 'https://sdk-connect4.s3.amazonaws.com/'
+  APP_URL: 'https://connect40-dev-Topia.topia-rtsdk.com/api/'
+  INSTANCE_DOMAIN: 'api.topia.io'
+  INSTANCE_PROTOCOL: 'https'
+  INTERACTIVE_KEY: 'uKwKx2KhNZk205p1lMhh'
+  NODE_ENV: 'production'
+  PORT: '3000'
