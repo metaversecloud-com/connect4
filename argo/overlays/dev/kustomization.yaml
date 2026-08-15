@@ -27,3 +27,4 @@ images:
   - name: connect40
     newName: 368076259134.dkr.ecr.us-east-1.amazonaws.com/sdk-example
     digest: sha256:b8bc75f7c47b6c4cbe562f175b8b5dde9f8809fa632300cc5b90ea0fb3a95122
+    newTag: connect4
