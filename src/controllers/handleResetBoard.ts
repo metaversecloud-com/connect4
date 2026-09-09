@@ -55,9 +55,7 @@ export const handleResetBoard = async (req: Request, res: Response) => {
       const resetAllowedDate = new Date();
       resetAllowedDate.setMinutes(resetAllowedDate.getMinutes() - 5);
 
-      if (!isAdmin && !lastInteraction) {
-        throw "Nothing to reset!";
-      } else if (
+      if (
         !isAdmin &&
         player1.visitorId !== visitorId &&
         player2.visitorId !== visitorId &&
