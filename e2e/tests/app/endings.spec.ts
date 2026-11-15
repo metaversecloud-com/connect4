@@ -1,7 +1,7 @@
 // Wins and draws: four in a row in every direction, the crown and particles, analytics, and the draw
 // once the board is full.
 import { BOARD_CENTER, ALICE, BOB, KEY_POSITION, expect, gameData, space, test } from "../../fixtures";
-import { S3_BUCKET } from "../../constants";
+import { S3_BUCKET } from "../../app.config";
 import type { TopiaWorld } from "../../fixtures";
 
 const completions = [
@@ -43,7 +43,7 @@ const LINES = [
 
 for (const { name, grid, next, column, line } of LINES) {
   test(`four in a ${name} line win the game`, async ({ world }) => {
-    await world.seed({ assetData: gameData({ grid, next }) });
+    await world.seedGame({ assetData: gameData({ grid, next }) });
 
     const response = await world.drop(ALICE, column);
 
@@ -55,7 +55,7 @@ for (const { name, grid, next, column, line } of LINES) {
 }
 
 test("player two can win too, and gets the crown on their side", async ({ world }) => {
-  await world.seed({ assetData: gameData({ grid: ["1.....2", "1.....2", "1.1...2"] }) });
+  await world.seedGame({ assetData: gameData({ grid: ["1.....2", "1.....2", "1.1...2"] }) });
 
   const response = await world.drop(BOB, 6);
 
@@ -64,7 +64,7 @@ test("player two can win too, and gets the crown on their side", async ({ world 
 });
 
 test("three in a row isn't a win", async ({ world }) => {
-  await world.seed({ assetData: gameData({ grid: ["12.....", "12....."] }) });
+  await world.seedGame({ assetData: gameData({ grid: ["12.....", "12....."] }) });
 
   await world.drop(ALICE, 0);
 
@@ -81,7 +81,7 @@ test("the game only ends in a draw once all 42 spaces are filled", async ({ worl
   // Known bug: the draw check is `claimed spaces === 41`, so the game is called a draw after the 41st
   // piece while one space is still empty, and the 42nd can never be played.
   test.fail(true, "EXP-448 #1: draw declared with one space left");
-  await world.seed({ assetData: gameData({ grid: ["..21212", ...FULL.slice(1)] }) });
+  await world.seedGame({ assetData: gameData({ grid: ["..21212", ...FULL.slice(1)] }) });
 
   expect((await world.drop(ALICE, 1))?.ok()).toBe(true);
   expect((await world.game()).isGameOver).toBe(false);
@@ -107,7 +107,7 @@ test("four in a row with the 41st piece is a win, not a draw", async ({ world })
   // (ties for both, no crown).
   test.fail(true, "EXP-448 #1: winning 41st piece reported as a draw");
   // 20 pieces each; column 5 is one short and Alice's piece there completes a line.
-  await world.seed({ assetData: gameData({ grid: ["1.122.2", "1122112", "2211211", "1122212", "1212122", "1212121"] }) });
+  await world.seedGame({ assetData: gameData({ grid: ["1.122.2", "1122112", "2211211", "1122212", "1212122", "1212121"] }) });
 
   expect((await world.drop(ALICE, 5))?.ok()).toBe(true);
 
@@ -116,7 +116,7 @@ test("four in a row with the 41st piece is a win, not a draw", async ({ world })
 });
 
 test("a whole game from claiming seats to a win", async ({ world }) => {
-  await world.seed({ assetData: gameData({ p1: null, p2: null }) });
+  await world.seedGame({ assetData: gameData({ p1: null, p2: null }) });
 
   expect((await world.select(ALICE, 1))?.ok()).toBe(true);
   expect((await world.select(BOB, 2))?.ok()).toBe(true);
