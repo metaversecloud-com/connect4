@@ -3,7 +3,7 @@
 import { ALICE, BOB, CAROL, KEY_ASSET_ID, SCENE_DROP_ID, expect, gameData, test } from "../../fixtures";
 
 test("the first player to click a seat takes it and waits for an opponent", async ({ world }) => {
-  await world.seed({ assetData: gameData({ p1: null, p2: null }) });
+  await world.seedGame({ assetData: gameData({ p1: null, p2: null }) });
 
   const response = await world.select(ALICE, 1);
 
@@ -21,7 +21,7 @@ test("the first player to click a seat takes it and waits for an opponent", asyn
 });
 
 test("the second player starts the game", async ({ world }) => {
-  await world.seed({ assetData: gameData({ p2: null }) });
+  await world.seedGame({ assetData: gameData({ p2: null }) });
 
   const response = await world.select(BOB, 2);
 
@@ -39,7 +39,7 @@ test("the second player starts the game", async ({ world }) => {
 });
 
 test("the first click on a board without game state sets it up and links the scene to its key asset", async ({ world }) => {
-  await world.seed({ assetData: {} });
+  await world.seedGame({ assetData: {} });
 
   const response = await world.select(BOB, 2);
 
@@ -57,7 +57,7 @@ test("the first click on a board without game state sets it up and links the sce
 });
 
 test("a seat that's already taken can't be claimed by someone else", async ({ world }) => {
-  await world.seed({ assetData: gameData({ p2: null }) });
+  await world.seedGame({ assetData: gameData({ p2: null }) });
 
   void world.select(CAROL, 1);
 
@@ -69,7 +69,7 @@ test("a seat that's already taken can't be claimed by someone else", async ({ wo
 });
 
 test("a player can't take both seats to play against themselves", async ({ world }) => {
-  await world.seed({ assetData: gameData({ p2: null }) });
+  await world.seedGame({ assetData: gameData({ p2: null }) });
 
   void world.select(ALICE, 2);
 
@@ -80,7 +80,7 @@ test("a player can't take both seats to play against themselves", async ({ world
 });
 
 test("a bystander can't take over a full game", async ({ world }) => {
-  await world.seed({ assetData: gameData() });
+  await world.seedGame({ assetData: gameData() });
 
   void world.select(CAROL, 2);
 
@@ -93,7 +93,7 @@ test("a refused seat click still answers the webhook", async ({ world }) => {
   // Known bug: the refusal branch ends with `return console.log(...)` and never sends a response, so the
   // webhook request stays open until Topia gives up on it.
   test.fail(true, "EXP-448 #2: refused clicks never get an HTTP response");
-  await world.seed({ assetData: gameData() });
+  await world.seedGame({ assetData: gameData() });
 
   const response = await world.select(CAROL, 1, { timeout: 5_000 });
 
@@ -105,7 +105,7 @@ test("only seats 1 and 2 exist", async ({ world }) => {
   // Known bug: the seat number isn't checked. /select-player/3 stores a "player3" entry, records a join
   // and announces "Find a second player!", though nobody took a real seat.
   test.fail(true, "EXP-448 #4: seat number isn't validated");
-  await world.seed({ assetData: gameData({ p1: null, p2: null }) });
+  await world.seedGame({ assetData: gameData({ p1: null, p2: null }) });
 
   await world.select(CAROL, 3, { timeout: 3_000 });
 

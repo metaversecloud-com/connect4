@@ -6,7 +6,7 @@ import { ALICE, BOB, CAROL, expect, gameData, test } from "../../fixtures";
 test.describe("columns outside the board", () => {
   for (const column of ["7", "-1", "left"]) {
     test(`a move into column ${column} is rejected and doesn't use up the turn`, async ({ world }) => {
-      await world.seed({ assetData: gameData({ next: ALICE }) });
+      await world.seedGame({ assetData: gameData({ next: ALICE }) });
 
       const response = await world.drop(ALICE, column, { timeout: 5_000 });
 
@@ -21,7 +21,7 @@ test.describe("columns outside the board", () => {
 
 test.describe("forged webhook bodies", () => {
   test("a webhook without an interactive nonce is rejected", async ({ world }) => {
-    await world.seed({ assetData: gameData({ next: ALICE }) });
+    await world.seedGame({ assetData: gameData({ next: ALICE }) });
 
     const response = await world.drop(ALICE, 3, { overrides: { interactiveNonce: "" } });
 
@@ -31,7 +31,7 @@ test.describe("forged webhook bodies", () => {
   });
 
   test("a visitor who isn't in the world can't move", async ({ world }) => {
-    await world.seed({ assetData: gameData({ next: ALICE }) });
+    await world.seedGame({ assetData: gameData({ next: ALICE }) });
 
     const response = await world.drop(ALICE, 3, { overrides: { visitorId: "999" } });
 
@@ -43,7 +43,7 @@ test.describe("forged webhook bodies", () => {
     // Known bug (EXP-428 #6): getCredentials never compares interactivePublicKey with INTERACTIVE_KEY, and
     // the SDK signs every call with the app's own key, so the move goes through.
     test.fail(true, "EXP-428 #6: getCredentials never checks the public key");
-    await world.seed({ assetData: gameData({ next: ALICE }) });
+    await world.seedGame({ assetData: gameData({ next: ALICE }) });
 
     const response = await world.drop(ALICE, 3, { overrides: { interactivePublicKey: "someone-else" } });
 
@@ -54,7 +54,7 @@ test.describe("forged webhook bodies", () => {
 
 test.describe("at the same time", () => {
   test("a player clicking two columns at once only gets one move", async ({ world }) => {
-    await world.seed({ assetData: gameData({ next: ALICE }) });
+    await world.seedGame({ assetData: gameData({ next: ALICE }) });
 
     const responses = await Promise.all([world.drop(ALICE, 0, { timeout: 5_000 }), world.drop(ALICE, 6, { timeout: 5_000 })]);
 
@@ -67,7 +67,7 @@ test.describe("at the same time", () => {
   });
 
   test("both players clicking at once only lets the player whose turn it is move", async ({ world }) => {
-    await world.seed({ assetData: gameData({ next: ALICE }) });
+    await world.seedGame({ assetData: gameData({ next: ALICE }) });
 
     await Promise.all([world.drop(ALICE, 0, { timeout: 5_000 }), world.drop(BOB, 6, { timeout: 5_000 })]);
 
@@ -82,7 +82,7 @@ test.describe("at the same time", () => {
     // the "already selected" check on state read before the lock. Both are told they joined, both joins
     // are recorded, and the last write wins the seat.
     test.fail(true, "EXP-448 #3: simultaneous seat claims aren't serialized");
-    await world.seed({ assetData: gameData({ p1: null, p2: null }) });
+    await world.seedGame({ assetData: gameData({ p1: null, p2: null }) });
 
     const responses = await Promise.all([world.select(ALICE, 1, { timeout: 5_000 }), world.select(CAROL, 1, { timeout: 5_000 })]);
 
@@ -94,7 +94,7 @@ test.describe("at the same time", () => {
     // Known bug: each request sees the other seat still free, so neither counts as the second player:
     // GAME_ON never fires and the board keeps saying "Find a second player!".
     test.fail(true, "EXP-448 #3: simultaneous seat claims aren't serialized");
-    await world.seed({ assetData: gameData({ p1: null, p2: null }) });
+    await world.seedGame({ assetData: gameData({ p1: null, p2: null }) });
 
     await Promise.all([world.select(ALICE, 1), world.select(BOB, 2)]);
 
@@ -105,7 +105,7 @@ test.describe("at the same time", () => {
 });
 
 test("error responses never carry the interactive secret", async ({ request, world }) => {
-  await world.seed({ assetData: gameData({ grid: ["12.....", "12....."] }) });
+  await world.seedGame({ assetData: gameData({ grid: ["12.....", "12....."] }) });
 
   const responses = await Promise.all([
     request.post("/api/click/3"), // no credentials

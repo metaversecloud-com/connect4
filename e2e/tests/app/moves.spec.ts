@@ -1,7 +1,8 @@
 // Taking turns: the arrow above each column posts to /api/click/:column (webhook) when clicked.
 // Refused moves never get an HTTP answer (EXP-448 #2), so those tests wait for the state instead.
 import { ALICE, BOB, CAROL, SCENE_DROP_ID, expect, gameData, space, spacePosition, test } from "../../fixtures";
-import { INTERACTIVE_KEY, S3_BUCKET } from "../../constants";
+import { S3_BUCKET } from "../../app.config";
+import { INTERACTIVE_KEY } from "../../constants";
 import type { TopiaWorld } from "../../fixtures";
 
 /** Waits until the app has recorded a refused move (it bumps turnCount last). */
@@ -9,7 +10,7 @@ const refused = async (world: TopiaWorld, turnCount: number) =>
   expect.poll(async () => (await world.game()).turnCount).toBe(turnCount);
 
 test("player one's move drops their piece at the bottom of the column and passes the turn", async ({ world }) => {
-  await world.seed({ assetData: gameData({ next: ALICE }) });
+  await world.seedGame({ assetData: gameData({ next: ALICE }) });
 
   const response = await world.drop(ALICE, 3);
 
@@ -39,7 +40,7 @@ test("player one's move drops their piece at the bottom of the column and passes
 });
 
 test("pieces stack on top of the ones already in the column", async ({ world }) => {
-  await world.seed({ assetData: gameData({ grid: ["2......", "1......"] }) });
+  await world.seedGame({ assetData: gameData({ grid: ["2......", "1......"] }) });
 
   const response = await world.drop(ALICE, 0);
 
@@ -51,7 +52,7 @@ test("pieces stack on top of the ones already in the column", async ({ world }) 
 });
 
 test("player two's move drops their own piece", async ({ world }) => {
-  await world.seed({ assetData: gameData({ grid: ["...1..."] }) });
+  await world.seedGame({ assetData: gameData({ grid: ["...1..."] }) });
 
   const response = await world.drop(BOB, 4);
 
@@ -64,7 +65,7 @@ test("player two's move drops their own piece", async ({ world }) => {
 });
 
 test("a player can't move twice in a row", async ({ world }) => {
-  await world.seed({ assetData: gameData({ grid: ["...1..."] }) });
+  await world.seedGame({ assetData: gameData({ grid: ["...1..."] }) });
 
   void world.drop(ALICE, 0);
 
@@ -77,7 +78,7 @@ test("a player can't move twice in a row", async ({ world }) => {
 });
 
 test("nothing can be dropped into a full column", async ({ world }) => {
-  await world.seed({ assetData: gameData({ grid: ["2......", "1......", "2......", "1......", "2......", "1......"] }) });
+  await world.seedGame({ assetData: gameData({ grid: ["2......", "1......", "2......", "1......", "2......", "1......"] }) });
 
   void world.drop(ALICE, 0);
 
@@ -89,7 +90,7 @@ test("nothing can be dropped into a full column", async ({ world }) => {
 });
 
 test("someone who isn't playing can't move", async ({ world }) => {
-  await world.seed({ assetData: gameData({ next: ALICE }) });
+  await world.seedGame({ assetData: gameData({ next: ALICE }) });
 
   void world.drop(CAROL, 3);
 
@@ -100,7 +101,7 @@ test("someone who isn't playing can't move", async ({ world }) => {
 });
 
 test("nobody can move before both players have joined", async ({ world }) => {
-  await world.seed({ assetData: gameData({ p2: null }) });
+  await world.seedGame({ assetData: gameData({ p2: null }) });
 
   void world.drop(ALICE, 3);
 
@@ -110,7 +111,7 @@ test("nobody can move before both players have joined", async ({ world }) => {
 });
 
 test("nobody can move once the game is over", async ({ world }) => {
-  await world.seed({ assetData: gameData({ grid: ["1......", "12.....", "12.....", "12....."], isGameOver: true }) });
+  await world.seedGame({ assetData: gameData({ grid: ["1......", "12.....", "12.....", "12....."], isGameOver: true }) });
 
   void world.drop(BOB, 1);
 
@@ -121,7 +122,7 @@ test("nobody can move once the game is over", async ({ world }) => {
 });
 
 test("nobody can move while a reset is in progress", async ({ world }) => {
-  await world.seed({ assetData: gameData({ next: ALICE, isResetInProgress: true }) });
+  await world.seedGame({ assetData: gameData({ next: ALICE, isResetInProgress: true }) });
 
   const response = await world.drop(ALICE, 3);
 
@@ -134,7 +135,7 @@ test("a refused move still answers the webhook", async ({ world }) => {
   // Known bug: every refusal branch ends with `return console.log(...)` and never sends a response, so
   // the webhook request stays open until Topia gives up on it.
   test.fail(true, "EXP-448 #2: refused clicks never get an HTTP response");
-  await world.seed({ assetData: gameData({ next: ALICE }) });
+  await world.seedGame({ assetData: gameData({ next: ALICE }) });
 
   const response = await world.drop(CAROL, 3, { timeout: 5_000 });
 
@@ -147,7 +148,7 @@ test("when player two moves first, the board says it's player one's turn", async
   // (lastPlayerTurn null) whoever moves first is shown as the next player, so after Bob's opening move
   // the board reads "It's Bob's turn".
   test.fail(true, "EXP-448 #5: wrong turn text after player two's opening move");
-  await world.seed({ assetData: gameData() });
+  await world.seedGame({ assetData: gameData() });
 
   const response = await world.drop(BOB, 3);
 

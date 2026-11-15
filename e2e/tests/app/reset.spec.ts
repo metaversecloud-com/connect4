@@ -1,7 +1,7 @@
 // The reset button (the key asset) posts to /api/reset: the first click builds the board, later clicks
 // rebuild it from scratch. Players and admins may reset any time, others only after 5 idle minutes.
 import { ADMIN, ALICE, BOARD_CENTER, BOB, CAROL, DEFAULT_GAME_TEXT, KEY_ASSET_ID, KEY_POSITION, SCENE_DROP_ID, expect, gameData, test } from "../../fixtures";
-import { APP_URL, S3_BUCKET } from "../../constants";
+import { APP_URL, S3_BUCKET } from "../../app.config";
 import type { TopiaWorld } from "../../fixtures";
 
 const IN_PROGRESS = ["12.....", "12....."];
@@ -45,7 +45,7 @@ const expectWebhooks = async (world: TopiaWorld) => {
 };
 
 test("the first click on a freshly dropped key asset builds the board", async ({ world }) => {
-  await world.seed({ withBoard: false });
+  await world.seedGame({ withBoard: false });
 
   const response = await world.reset(CAROL);
 
@@ -69,7 +69,7 @@ test("the first click on a freshly dropped key asset builds the board", async ({
 });
 
 test("a player's reset clears the board and starts a new game", async ({ world }) => {
-  await world.seed({ assetData: gameData({ grid: IN_PROGRESS }), extraAssets: leftovers });
+  await world.seedGame({ assetData: gameData({ grid: IN_PROGRESS }), extraAssets: leftovers });
 
   const response = await world.reset(ALICE);
 
@@ -98,7 +98,7 @@ test("a player's reset clears the board and starts a new game", async ({ world }
 });
 
 test("an admin can reset a game they aren't playing", async ({ world }) => {
-  await world.seed({ assetData: gameData({ grid: IN_PROGRESS }), extraAssets: leftovers });
+  await world.seedGame({ assetData: gameData({ grid: IN_PROGRESS }), extraAssets: leftovers });
 
   const response = await world.reset(ADMIN);
 
@@ -108,7 +108,7 @@ test("an admin can reset a game they aren't playing", async ({ world }) => {
 });
 
 test("a bystander can't reset a game that's being played", async ({ world }) => {
-  await world.seed({ assetData: gameData({ grid: IN_PROGRESS }), extraAssets: leftovers });
+  await world.seedGame({ assetData: gameData({ grid: IN_PROGRESS }), extraAssets: leftovers });
 
   const response = await world.reset(CAROL);
 
@@ -122,7 +122,7 @@ test("a bystander can't reset a game that's being played", async ({ world }) => 
 });
 
 test("claiming to be an admin in the request doesn't let a bystander reset", async ({ world }) => {
-  await world.seed({ assetData: gameData({ grid: IN_PROGRESS }) });
+  await world.seedGame({ assetData: gameData({ grid: IN_PROGRESS }) });
 
   const response = await world.reset(CAROL, { overrides: { isAdmin: "true" } });
 
@@ -134,7 +134,7 @@ test("a refused reset leaves the status text as it was", async ({ world }) => {
   // Known bug: the refusal path restores the status text to the "Click on a game piece..." start text,
   // so the board stops showing whose turn it is in the middle of a game.
   test.fail(true, "EXP-448 #6: refused reset overwrites the status text");
-  await world.seed({
+  await world.seedGame({
     assetData: gameData({ grid: IN_PROGRESS }),
     extraAssets: { "game-text": { id: "game-text", uniqueName: "gameText", sceneDropId: SCENE_DROP_ID, text: "It's Alice's turn" } },
   });
@@ -145,7 +145,7 @@ test("a refused reset leaves the status text as it was", async ({ world }) => {
 });
 
 test("a bystander can reset a board nobody has touched for 5 minutes", async ({ world }) => {
-  await world.seed({ assetData: gameData({ grid: IN_PROGRESS, lastInteraction: SIX_MINUTES_AGO() }), extraAssets: leftovers });
+  await world.seedGame({ assetData: gameData({ grid: IN_PROGRESS, lastInteraction: SIX_MINUTES_AGO() }), extraAssets: leftovers });
 
   const response = await world.reset(CAROL);
 
@@ -155,7 +155,7 @@ test("a bystander can reset a board nobody has touched for 5 minutes", async ({ 
 });
 
 test("two resets at once leave exactly one board", async ({ world }) => {
-  await world.seed({ assetData: gameData({ grid: IN_PROGRESS }), extraAssets: leftovers });
+  await world.seedGame({ assetData: gameData({ grid: IN_PROGRESS }), extraAssets: leftovers });
 
   const responses = await Promise.all([world.reset(ALICE), world.reset(BOB)]);
 
@@ -171,7 +171,7 @@ test("a bystander can't build a second board by sending another asset's id to /r
   // (here the board background) has no game state yet, so the app takes the "first click" branch, skips
   // the permission check and drops a whole second board with its webhooks.
   test.fail(true, "EXP-448 #7: /reset trusts the request's assetId");
-  await world.seed({ assetData: gameData({ grid: IN_PROGRESS }) });
+  await world.seedGame({ assetData: gameData({ grid: IN_PROGRESS }) });
 
   await world.webhook("/reset", CAROL, { assetId: "board", uniqueName: "board" });
 
