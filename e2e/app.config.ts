@@ -68,10 +68,6 @@ export type RouteSpec = {
   knownBugs?: KnownBugs;
 };
 
-// getCredentials (protected file) returns { error } instead of throwing, so every route that
-// uses it has this bug until it's fixed there.
-const GET_CREDENTIALS_DOESNT_THROW = "EXP-428 #6: getCredentials doesn't throw";
-
 /**
  * API routes that read the session credentials (getCredentials). Each one must reject missing or
  * foreign credentials and must never send the interactive secret to the browser. List them all.
@@ -82,21 +78,15 @@ const GET_CREDENTIALS_DOESNT_THROW = "EXP-428 #6: getCredentials doesn't throw";
  */
 // Connect 4's routes are webhooks of the board's assets (seat buttons, column arrows, reset button): the
 // credentials come as top-level fields of the JSON body (getCredentials(req.body) in middleware/auth.ts).
-const FOREIGN_KEY_ACCEPTED = "EXP-428 #6: getCredentials never checks the public key";
-const webhook = (path: string, knownBugs: KnownBugs = {}): RouteSpec => ({
-  method: "post",
-  path,
-  credentialsIn: "body",
-  knownBugs: { unnamedCredentialError: GET_CREDENTIALS_DOESNT_THROW, acceptsForeignCredentials: FOREIGN_KEY_ACCEPTED, ...knownBugs },
-});
+const webhook = (path: string, knownBugs?: KnownBugs): RouteSpec => ({ method: "post", path, credentialsIn: "body", knownBugs });
 
 // The platform tests' visitor isn't seated in the default world, so its click on a column is refused, and a
-// refused click never answers the webhook (EXP-448 #2): with valid or foreign credentials alike.
+// refused click never answers the webhook (EXP-448 #2).
 const REFUSED_CLICK_HANGS = "EXP-448 #2: a refused click ends with return console.log(...), no response";
 
 export const CREDENTIALED_ROUTES: RouteSpec[] = [
   webhook("/select-player/1"),
-  webhook("/click/3", { answersNever: REFUSED_CLICK_HANGS, acceptsForeignCredentials: `${FOREIGN_KEY_ACCEPTED}; ${REFUSED_CLICK_HANGS}` }),
+  webhook("/click/3", { answersNever: REFUSED_CLICK_HANGS }),
   webhook("/reset"),
 ];
 
@@ -154,10 +144,7 @@ export const HEALTH_KNOWN_BUGS: { incompleteContract?: string } = {};
  * registers its own logging handler. Fix: process.removeAllListeners("unhandledRejection") before
  * registering the app's handler.
  */
-export const PROCESS_KNOWN_BUGS: { exitsOnUnhandledRejection?: string } = {
-  exitsOnUnhandledRejection:
-    "EXP-472: @rtsdk/topia's unhandledRejection hook calls process.exit(1); server/index.ts's handler doesn't stop it",
-};
+export const PROCESS_KNOWN_BUGS: { exitsOnUnhandledRejection?: string } = {};
 
 /**
  * The request system.spec sends a malformed JSON body to. Default: the first POST/PUT route in
@@ -173,9 +160,7 @@ export const MALFORMED_JSON_REQUEST: { method: "post" | "put"; path: string } | 
  * middleware after express.json()). Fix: an error middleware that answers body-parser errors
  * (err.type === "entity.parse.failed") with res.status(400).json({ success: false, error: "Invalid JSON" }).
  */
-export const ERROR_KNOWN_BUGS: { malformedJson?: string } = {
-  malformedJson: "EXP-473: no error middleware: Express' default error page shows the stack trace (NODE_ENV isn't production)",
-};
+export const ERROR_KNOWN_BUGS: { malformedJson?: string } = {};
 
 /**
  * true starts mock-redis/server.mjs (an in-memory Redis) next to mock-topia and points REDIS_URL at it

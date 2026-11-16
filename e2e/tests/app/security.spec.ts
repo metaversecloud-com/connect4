@@ -40,9 +40,6 @@ test.describe("forged webhook bodies", () => {
   });
 
   test("credentials signed for another app's public key are rejected", async ({ world }) => {
-    // Known bug (EXP-428 #6): getCredentials never compares interactivePublicKey with INTERACTIVE_KEY, and
-    // the SDK signs every call with the app's own key, so the move goes through.
-    test.fail(true, "EXP-428 #6: getCredentials never checks the public key");
     await world.seedGame({ assetData: gameData({ next: ALICE }) });
 
     const response = await world.drop(ALICE, 3, { overrides: { interactivePublicKey: "someone-else" } });
