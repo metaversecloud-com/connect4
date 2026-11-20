@@ -1,4 +1,4 @@
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 import bodyParser from "body-parser";
 import router from "./routes.js";
 import cors from "cors";
@@ -19,9 +19,16 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+// A malformed JSON body gets a clean 400 instead of Express' default error page (stack trace, file paths).
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  if (err?.type === "entity.parse.failed") return res.status(400).json({ success: false, error: "Invalid JSON" });
+  next(err);
+});
 app.use("/api", router);
 
-// Prevent crashes from unhandled promise rejections (e.g., API timeouts after response sent)
+// Prevent crashes from unhandled promise rejections (e.g., API timeouts after response sent).
+// @rtsdk/topia registers its own handler that calls process.exit(1) when it's imported: remove it first.
+process.removeAllListeners("unhandledRejection");
 process.on("unhandledRejection", (reason, promise) => {
   console.error("Unhandled Rejection:", reason);
 });
